@@ -1,0 +1,27 @@
+# Godot 4+ specific ignores
+.godot/
+
+# Build exports
+/windows/
+/android/
+/web/
+/ios/
+
+# .NET / C# build artifacts
+bin/
+obj/
+*.user
+*.suo
+
+# Mono crash logs
+mono_crash.*.json
+
+# IDE
+.idea/
+.vs/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
