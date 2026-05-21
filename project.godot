@@ -13,6 +13,14 @@ config_version=5
 config/name="MineSweeper"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://resources/images/icon.svg"
+run/main_scene="res://scenes/main.tscn"
+
+[display]
+
+window/size/viewport_width=800
+window/size/viewport_height=600
+window/size/min_width=400
+window/size/min_height=300
 
 [dotnet]
 

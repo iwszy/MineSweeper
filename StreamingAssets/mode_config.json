@@ -1,0 +1,15 @@
+{
+  "presets": [
+    { "name": "入门", "width": 9, "height": 9, "mines": 10 },
+    { "name": "普通", "width": 16, "height": 16, "mines": 40 },
+    { "name": "进阶", "width": 30, "height": 16, "mines": 99 },
+    { "name": "大师", "width": 22, "height": 22, "mines": 150 },
+    { "name": "超凡", "width": 28, "height": 24, "mines": 240 }
+  ],
+  "customMode": {
+    "minWidth": 5,
+    "maxWidth": 40,
+    "minHeight": 5,
+    "maxHeight": 40
+  }
+}

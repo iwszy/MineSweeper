@@ -3,5 +3,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="StreamingAssets\achievement_config.json" />
+    <Content Include="StreamingAssets\mode_config.json" />
+  </ItemGroup>
 </Project>
