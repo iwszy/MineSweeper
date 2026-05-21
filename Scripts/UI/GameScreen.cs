@@ -22,7 +22,7 @@ public partial class GameScreen : Control
 
     // Stats tracking for achievements
     public bool FlagsEverUsed { get; private set; }
-    public int CurrentConsecutiveReveals { get; private set; }
+    private int CurrentConsecutiveReveals { get; set; }
     public int MaxConsecutiveReveals { get; private set; }
     public int MaxChordRevealCount { get; private set; }
     public int FirstClickRevealCount { get; private set; }

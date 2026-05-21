@@ -16,151 +16,85 @@ public partial class Cell : Control
     public int GridX { get; set; }
     public int GridY { get; set; }
 
-    private Panel _panel = null!;
-    private Label _label = null!;
+    private TextureRect _textureRect = null!;
 
-    private StyleBoxFlat _styleHidden = null!;
-    private StyleBoxFlat _styleRevealed = null!;
-    private StyleBoxFlat _styleMineTriggered = null!;
-    private StyleBoxFlat _styleMineRevealed = null!;
-    private StyleBoxFlat _styleWrongFlag = null!;
+    private static AtlasTexture?[]? _numberTextures;
+    private static AtlasTexture? _hideTexture;
+    private static AtlasTexture? _flagTexture;
+    private static AtlasTexture? _questionTexture;
+    private static AtlasTexture? _mineTexture;
+    private static AtlasTexture? _explodeTexture;
+    private static AtlasTexture? _errorTexture;
+    private static bool _texturesLoaded;
 
     public Cell()
     {
-        CustomMinimumSize = new Vector2(28, 28);
+        CustomMinimumSize = new Vector2(25, 25);
         MouseFilter = MouseFilterEnum.Stop;
 
-        _panel = new Panel();
-        _panel.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        _panel.OffsetLeft = 1;
-        _panel.OffsetTop = 1;
-        _panel.OffsetRight = -1;
-        _panel.OffsetBottom = -1;
-        AddChild(_panel);
+        LoadTexturesOnce();
 
-        _label = new Label();
-        _label.SetAnchorsPreset(Control.LayoutPreset.Center);
-        _label.HorizontalAlignment = HorizontalAlignment.Center;
-        _label.VerticalAlignment = VerticalAlignment.Center;
-        _label.AddThemeFontSizeOverride("font_size", 14);
-        AddChild(_label);
+        _textureRect = new TextureRect();
+        _textureRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        _textureRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+        _textureRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+        AddChild(_textureRect);
 
-        CreateStyles();
         SetDisplay(CellState.Hidden, -1);
     }
 
-    private void CreateStyles()
+    private static void LoadTexturesOnce()
     {
-        _styleHidden = new StyleBoxFlat
-        {
-            BgColor = ColorPalette.PanelHidden,
-            ShadowSize = 3,
-            ShadowOffset = new Vector2(1, 1),
-            ShadowColor = new Color(0.4f, 0.4f, 0.4f),
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.5f, 0.5f, 0.5f),
-        };
+        if (_texturesLoaded) return;
+        _texturesLoaded = true;
 
-        _styleRevealed = new StyleBoxFlat
-        {
-            BgColor = ColorPalette.PanelRevealed,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.55f, 0.55f, 0.55f),
-        };
+        _numberTextures = new AtlasTexture?[9];
+        for (int i = 0; i <= 8; i++)
+            _numberTextures[i] =
+                GD.Load<AtlasTexture>($"res://resources/images/img.sprites/{i}.tres");
 
-        _styleMineTriggered = new StyleBoxFlat
-        {
-            BgColor = ColorPalette.MineTriggered,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.55f, 0.55f, 0.55f),
-        };
+        _hideTexture =
+            GD.Load<AtlasTexture>("res://resources/images/img.sprites/hide.tres");
+        _flagTexture =
+            GD.Load<AtlasTexture>("res://resources/images/img.sprites/flag.tres");
+        _questionTexture =
+            GD.Load<AtlasTexture>("res://resources/images/img.sprites/question.tres");
+        _mineTexture =
+            GD.Load<AtlasTexture>("res://resources/images/img.sprites/mine.tres");
+        _explodeTexture =
+            GD.Load<AtlasTexture>("res://resources/images/img.sprites/explode.tres");
+        _errorTexture =
+            GD.Load<AtlasTexture>("res://resources/images/img.sprites/error.tres");
+    }
 
-        _styleMineRevealed = new StyleBoxFlat
+    public void SetDisplay(CellState display, int adjacentMines)
+    {
+        _textureRect.Texture = display switch
         {
-            BgColor = ColorPalette.MineRevealed,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.55f, 0.55f, 0.55f),
-        };
-
-        _styleWrongFlag = new StyleBoxFlat
-        {
-            BgColor = ColorPalette.MineRevealed,
-            BorderWidthLeft = 1,
-            BorderWidthTop = 1,
-            BorderWidthRight = 1,
-            BorderWidthBottom = 1,
-            BorderColor = new Color(0.55f, 0.55f, 0.55f),
+            CellState.Hidden => _hideTexture,
+            CellState.Revealed when adjacentMines == -1 => _mineTexture,
+            CellState.Revealed => GetNumberTexture(adjacentMines),
+            CellState.Flagged => _flagTexture,
+            CellState.Question => _questionTexture,
+            _ => _hideTexture
         };
     }
 
-    public void SetDisplay(CellState state, int adjacentMines)
+    private static AtlasTexture? GetNumberTexture(int adjacentMines)
     {
-        switch (state)
-        {
-            case CellState.Hidden:
-                _panel.AddThemeStyleboxOverride("panel", _styleHidden);
-                _label.Text = "";
-                break;
-
-            case CellState.Revealed:
-                if (adjacentMines == -1)
-                {
-                    _panel.AddThemeStyleboxOverride("panel", _styleMineRevealed);
-                    _label.Text = ColorPalette.MineSymbol;
-                    _label.AddThemeColorOverride("font_color", Colors.Black);
-                }
-                else if (adjacentMines == 0)
-                {
-                    _panel.AddThemeStyleboxOverride("panel", _styleRevealed);
-                    _label.Text = "";
-                }
-                else
-                {
-                    _panel.AddThemeStyleboxOverride("panel", _styleRevealed);
-                    _label.Text = adjacentMines.ToString();
-                    if (adjacentMines >= 1 && adjacentMines <= 8)
-                        _label.AddThemeColorOverride("font_color", ColorPalette.NumberColors[adjacentMines]);
-                }
-                break;
-
-            case CellState.Flagged:
-                _panel.AddThemeStyleboxOverride("panel", _styleHidden);
-                _label.Text = ColorPalette.FlagSymbol;
-                _label.AddThemeColorOverride("font_color", Colors.Red);
-                break;
-
-            case CellState.Question:
-                _panel.AddThemeStyleboxOverride("panel", _styleHidden);
-                _label.Text = ColorPalette.QuestionSymbol;
-                _label.AddThemeColorOverride("font_color", Colors.Black);
-                break;
-        }
+        if (_numberTextures != null && adjacentMines >= 0 && adjacentMines <= 8)
+            return _numberTextures[adjacentMines];
+        return _numberTextures?[0];
     }
 
     public void SetMineTriggered()
     {
-        _panel.AddThemeStyleboxOverride("panel", _styleMineTriggered);
-        _label.Text = ColorPalette.MineSymbol;
-        _label.AddThemeColorOverride("font_color", Colors.Black);
+        _textureRect.Texture = _explodeTexture;
     }
 
     public void SetWrongFlag()
     {
-        _panel.AddThemeStyleboxOverride("panel", _styleWrongFlag);
-        _label.Text = "X";
-        _label.AddThemeColorOverride("font_color", Colors.Red);
+        _textureRect.Texture = _errorTexture;
     }
 
     public override void _GuiInput(InputEvent @event)

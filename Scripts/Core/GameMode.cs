@@ -1,5 +1,3 @@
-using System;
-
 namespace MineSweeper;
 
 public readonly struct GameMode
@@ -75,11 +73,4 @@ public readonly struct GameMode
 
     public static GameMode Custom(int width, int height, int mineCount)
         => new("自定义", width, height, mineCount, true);
-
-    public static GameMode FindPreset(string name)
-    {
-        foreach (var p in Presets)
-            if (p.Name == name) return p;
-        return Presets[0];
-    }
 }
