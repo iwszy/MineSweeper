@@ -14,8 +14,7 @@ public partial class AppManager : Control
 
     private GameMode _lastMode;
 
-    public override void _Ready()
-    {
+    public override void _Ready() {
         _bestTimes = new BestTimes();
         _bestTimes.Load();
 
@@ -53,50 +52,43 @@ public partial class AppManager : Control
         _menuScreen.Refresh(_bestTimes);
     }
 
-    private void OnGameStartRequested(GameMode mode)
-    {
+    private void OnGameStartRequested(GameMode mode) {
         _lastMode = mode;
         _menuScreen.Visible = false;
         _gameScreen.Visible = true;
         _gameScreen.NewGame(mode);
     }
 
-    private void OnAchievementsRequested()
-    {
+    private void OnAchievementsRequested() {
         _menuScreen.Visible = false;
         _achievementGallery.Refresh(_achievementData);
         _achievementGallery.Visible = true;
     }
 
-    private void OnBackFromAchievements()
-    {
+    private void OnBackFromAchievements() {
         _achievementGallery.Visible = false;
         _menuScreen.Visible = true;
     }
 
-    private void OnCustomModeRequested()
-    {
+    private void OnCustomModeRequested() {
         _customModeDialog.ShowDialog();
     }
 
-    private void OnCustomModeConfirmed(int width, int height, int mines)
-    {
+    private void OnCustomModeConfirmed(int width, int height, int mines) {
         var mode = GameMode.Custom(width, height, mines);
         OnGameStartRequested(mode);
     }
 
-    private void OnGameEnded(bool won, double time, GameMode mode)
-    {
+    private void OnGameEnded(bool won, double time, GameMode mode) {
         var logic = _gameScreen.CurrentLogic;
 
         bool allMinesFlagged = false;
-        if (won && logic != null)
-        {
+        if (won && logic != null) {
             allMinesFlagged = true;
             for (int x = 0; x < logic.Model.Width; x++)
-                for (int y = 0; y < logic.Model.Height; y++)
-                    if (logic.Model.MineMap[x, y] && logic.DisplayState[x, y] != CellState.Flagged)
-                        allMinesFlagged = false;
+            for (int y = 0; y < logic.Model.Height; y++)
+                if (logic.Model.MineMap[x, y] && logic.DisplayState[x, y] != CellState.Flagged)
+                    allMinesFlagged = false;
         }
 
         var newAchievements = _achievementData.CheckOnGameEnd(
@@ -109,34 +101,28 @@ public partial class AppManager : Control
             _gameScreen.MaxConsecutiveReveals,
             _bestTimes);
 
-        if (won && !mode.IsCustom)
-        {
+        if (won && !mode.IsCustom) {
             bool isNewBest = _bestTimes.TryUpdate(mode.Name, time);
             _resultDialog.ShowResult(won, time, _bestTimes.Get(mode.Name), isNewBest,
                 newAchievements);
-        }
-        else
-        {
+        } else {
             _resultDialog.ShowResult(won, time, null, false,
                 newAchievements.Count > 0 ? newAchievements : null);
         }
     }
 
-    private void OnPlayAgain()
-    {
+    private void OnPlayAgain() {
         _resultDialog.Visible = false;
         _gameScreen.NewGame(_lastMode);
     }
 
-    private void OnBackFromGame()
-    {
+    private void OnBackFromGame() {
         _gameScreen.Visible = false;
         _menuScreen.Refresh(_bestTimes);
         _menuScreen.Visible = true;
     }
 
-    private void OnBackToMenu()
-    {
+    private void OnBackToMenu() {
         _resultDialog.Visible = false;
         _gameScreen.Visible = false;
         _menuScreen.Refresh(_bestTimes);

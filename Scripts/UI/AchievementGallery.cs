@@ -7,22 +7,20 @@ public partial class AchievementGallery : Control
 {
     public event Action? BackRequested;
 
-    public override void _Ready()
-    {
+    public override void _Ready() {
         SetAnchorsPreset(Control.LayoutPreset.FullRect);
     }
 
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed
-            && keyEvent.Keycode == Key.Escape)
+    public override void _UnhandledInput(InputEvent @event) {
+        if (@event is InputEventKey { Pressed: true, Keycode: Key.Escape }) {
             BackRequested?.Invoke();
+        }
     }
 
-    public void Refresh(AchievementData data)
-    {
-        foreach (var child in GetChildren())
+    public void Refresh(AchievementData data) {
+        foreach (var child in GetChildren()) {
             child.QueueFree();
+        }
 
         var margin = new MarginContainer();
         margin.SetAnchorsPreset(Control.LayoutPreset.FullRect);
@@ -36,8 +34,7 @@ public partial class AchievementGallery : Control
         vbox.AddThemeConstantOverride("separation", 12);
         margin.AddChild(vbox);
 
-        var title = new Label
-        {
+        var title = new Label {
             Text = "成就",
             HorizontalAlignment = HorizontalAlignment.Center,
         };
@@ -54,13 +51,11 @@ public partial class AchievementGallery : Control
         grid.AddThemeConstantOverride("v_separation", 8);
         scroll.AddChild(grid);
 
-        foreach (var def in AchievementDef.All)
-        {
+        foreach (var def in AchievementDef.All) {
             var panel = new Panel();
             panel.CustomMinimumSize = new Vector2(200, 80);
             var unlocked = data.IsUnlocked(def.Id);
-            var styleBox = new StyleBoxFlat
-            {
+            var styleBox = new StyleBoxFlat {
                 BgColor = unlocked
                     ? new Color(0.2f, 0.5f, 0.2f)
                     : new Color(0.3f, 0.3f, 0.3f),
@@ -82,16 +77,14 @@ public partial class AchievementGallery : Control
             innerVbox.OffsetBottom = -6;
             panel.AddChild(innerVbox);
 
-            var nameLabel = new Label
-            {
+            var nameLabel = new Label {
                 Text = unlocked ? def.Name : "???",
                 HorizontalAlignment = HorizontalAlignment.Center,
             };
             nameLabel.AddThemeFontSizeOverride("font_size", 16);
             innerVbox.AddChild(nameLabel);
 
-            var descLabel = new Label
-            {
+            var descLabel = new Label {
                 Text = unlocked ? def.Description : "达成条件隐藏",
                 HorizontalAlignment = HorizontalAlignment.Center,
             };

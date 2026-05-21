@@ -12,8 +12,7 @@ public partial class MainMenuScreen : Control
     private VBoxContainer _mainVBox = null!;
     private BestTimesPanel _bestTimesPanel = null!;
 
-    public override void _Ready()
-    {
+    public override void _Ready() {
         SetAnchorsPreset(Control.LayoutPreset.FullRect);
 
         _mainVBox = new VBoxContainer();
@@ -21,8 +20,7 @@ public partial class MainMenuScreen : Control
         _mainVBox.AddThemeConstantOverride("separation", 12);
         AddChild(_mainVBox);
 
-        var title = new Label
-        {
+        var title = new Label {
             Text = "扫 雷",
             HorizontalAlignment = HorizontalAlignment.Center,
         };
@@ -30,8 +28,7 @@ public partial class MainMenuScreen : Control
         _mainVBox.AddChild(title);
 
         // Mode label
-        var modeLabel = new Label
-        {
+        var modeLabel = new Label {
             Text = "选择模式",
             HorizontalAlignment = HorizontalAlignment.Center,
         };
@@ -39,8 +36,7 @@ public partial class MainMenuScreen : Control
         _mainVBox.AddChild(modeLabel);
 
         // Mode buttons
-        foreach (var mode in GameMode.Presets)
-        {
+        foreach (var mode in GameMode.Presets) {
             var btn = CreateModeButton(mode);
             _mainVBox.AddChild(btn);
         }
@@ -79,25 +75,21 @@ public partial class MainMenuScreen : Control
         bottomHBox.AddChild(exitBtn);
     }
 
-    private Button CreateModeButton(GameMode mode)
-    {
-        var btn = new Button
-        {
+    private Button CreateModeButton(GameMode mode) {
+        var btn = new Button {
             Text = $"{mode.Name}  ({mode.Width}x{mode.Height}, {mode.MineCount}雷)",
         };
         btn.Pressed += () => GameStartRequested?.Invoke(mode);
         return btn;
     }
 
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed
-            && keyEvent.Keycode == Key.Escape)
+    public override void _UnhandledInput(InputEvent @event) {
+        if (@event is InputEventKey { Pressed: true, Keycode: Key.Escape }) {
             GetTree().Quit();
+        }
     }
 
-    public void Refresh(BestTimes bestTimes)
-    {
+    public void Refresh(BestTimes bestTimes) {
         _bestTimesPanel.Refresh(bestTimes);
     }
 }

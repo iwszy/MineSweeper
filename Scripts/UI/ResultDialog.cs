@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MineSweeper;
 
@@ -14,8 +15,7 @@ public partial class ResultDialog : Window
     private Label _bestLabel = null!;
     private Label _achievementsLabel = null!;
 
-    public override void _Ready()
-    {
+    public override void _Ready() {
         Title = "游戏结束";
         Unresizable = true;
         AlwaysOnTop = true;
@@ -31,29 +31,25 @@ public partial class ResultDialog : Window
         vbox.OffsetBottom = -16;
         AddChild(vbox);
 
-        _titleLabel = new Label
-        {
+        _titleLabel = new Label {
             HorizontalAlignment = HorizontalAlignment.Center,
         };
         _titleLabel.AddThemeFontSizeOverride("font_size", 24);
         vbox.AddChild(_titleLabel);
 
-        _timeLabel = new Label
-        {
+        _timeLabel = new Label {
             HorizontalAlignment = HorizontalAlignment.Center,
         };
         _timeLabel.AddThemeFontSizeOverride("font_size", 16);
         vbox.AddChild(_timeLabel);
 
-        _bestLabel = new Label
-        {
+        _bestLabel = new Label {
             HorizontalAlignment = HorizontalAlignment.Center,
         };
         _bestLabel.AddThemeFontSizeOverride("font_size", 14);
         vbox.AddChild(_bestLabel);
 
-        _achievementsLabel = new Label
-        {
+        _achievementsLabel = new Label {
             HorizontalAlignment = HorizontalAlignment.Center,
             Text = "",
         };
@@ -68,16 +64,14 @@ public partial class ResultDialog : Window
         vbox.AddChild(btnHBox);
 
         var playAgainBtn = new Button { Text = "再来一局" };
-        playAgainBtn.Pressed += () =>
-        {
+        playAgainBtn.Pressed += () => {
             Hide();
             PlayAgainRequested?.Invoke();
         };
         btnHBox.AddChild(playAgainBtn);
 
         var backBtn = new Button { Text = "返回主菜单" };
-        backBtn.Pressed += () =>
-        {
+        backBtn.Pressed += () => {
             Hide();
             BackToMenuRequested?.Invoke();
         };
@@ -87,28 +81,23 @@ public partial class ResultDialog : Window
     }
 
     public void ShowResult(bool won, double time, double? bestTime, bool isNewBest,
-        List<AchievementDef.Achievement>? newAchievements)
-    {
+        List<AchievementDef.Achievement>? newAchievements) {
         _titleLabel.Text = won ? "你赢了!" : "游戏结束";
         _titleLabel.AddThemeColorOverride("font_color", won ? Colors.Green : Colors.Red);
         _timeLabel.Text = $"用时: {GameTimer.FormatTime(time)}";
 
-        if (isNewBest)
+        if (isNewBest) {
             _bestLabel.Text = "新纪录!";
-        else if (bestTime.HasValue)
+        } else if (bestTime.HasValue) {
             _bestLabel.Text = $"最佳成绩: {GameTimer.FormatTime(bestTime.Value)}";
-        else
+        } else {
             _bestLabel.Text = "";
-
-        if (newAchievements != null && newAchievements.Count > 0)
-        {
-            var names = new List<string>();
-            foreach (var a in newAchievements)
-                names.Add(a.Name);
-            _achievementsLabel.Text = $"达成成就: {string.Join(", ", names)}";
         }
-        else
-        {
+
+        if (newAchievements is { Count: > 0 }) {
+            var names = newAchievements.Select(a => a.Name).ToList();
+            _achievementsLabel.Text = $"达成成就: {string.Join(", ", names)}";
+        } else {
             _achievementsLabel.Text = "";
         }
 

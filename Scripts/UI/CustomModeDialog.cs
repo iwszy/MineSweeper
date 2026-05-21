@@ -13,8 +13,7 @@ public partial class CustomModeDialog : Window
     private Label _errorLabel = null!;
     private Button _okButton = null!;
 
-    public override void _Ready()
-    {
+    public override void _Ready() {
         Title = "自定义模式";
         Unresizable = true;
         AlwaysOnTop = true;
@@ -40,8 +39,7 @@ public partial class CustomModeDialog : Window
         _widthSpin.ValueChanged += OnSizeChanged;
         _heightSpin.ValueChanged += OnSizeChanged;
 
-        _errorLabel = new Label
-        {
+        _errorLabel = new Label {
             Text = "",
             HorizontalAlignment = HorizontalAlignment.Center,
         };
@@ -58,14 +56,13 @@ public partial class CustomModeDialog : Window
         btnHBox.AddChild(_okButton);
 
         var cancelBtn = new Button { Text = "取消" };
-        cancelBtn.Pressed += () => Hide();
+        cancelBtn.Pressed += Hide;
         btnHBox.AddChild(cancelBtn);
 
-        CloseRequested += () => Hide();
+        CloseRequested += Hide;
     }
 
-    private SpinBox CreateSpinRow(VBoxContainer parent, string labelText, int min, int max, int value)
-    {
+    private SpinBox CreateSpinRow(VBoxContainer parent, string labelText, int min, int max, int value) {
         var hbox = new HBoxContainer();
         var label = new Label { Text = labelText };
         hbox.AddChild(label);
@@ -75,45 +72,43 @@ public partial class CustomModeDialog : Window
         return spin;
     }
 
-    private void OnSizeChanged(double _)
-    {
+    private void OnSizeChanged(double _) {
         int w = (int)_widthSpin.Value;
         int h = (int)_heightSpin.Value;
         int maxMines = w * h - 1;
         _mineSpin.MaxValue = maxMines;
-        if (_mineSpin.Value > maxMines)
+        if (_mineSpin.Value > maxMines) {
             _mineSpin.Value = maxMines;
+        }
         ValidateInput();
     }
 
-    private void ValidateInput()
-    {
+    private void ValidateInput() {
         int w = (int)_widthSpin.Value;
         int h = (int)_heightSpin.Value;
         int m = (int)_mineSpin.Value;
 
-        if (m < 1)
+        if (m < 1) {
             _errorLabel.Text = "雷数至少为1";
-        else if (m >= w * h)
+        } else if (m >= w * h) {
             _errorLabel.Text = "雷数必须小于格子总数";
-        else if (w * h - 9 < m)
+        } else if (w * h - 9 < m) {
             _errorLabel.Text = "雷数过多，无法保证首次点击安全";
-        else
+        } else {
             _errorLabel.Text = "";
+        }
 
         _okButton.Disabled = _errorLabel.Text != "";
     }
 
-    private void OnOkPressed()
-    {
+    private void OnOkPressed() {
         if (_errorLabel.Text != "") return;
         Hide();
         CustomModeConfirmed?.Invoke(
             (int)_widthSpin.Value, (int)_heightSpin.Value, (int)_mineSpin.Value);
     }
 
-    public void ShowDialog()
-    {
+    public void ShowDialog() {
         _widthSpin.Value = 9;
         _heightSpin.Value = 9;
         _mineSpin.Value = 10;
