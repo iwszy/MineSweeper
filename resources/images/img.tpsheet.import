@@ -1,0 +1,16 @@
+[remap]
+
+importer="codeandweb.texturepacker_import_spritesheet"
+type="Resource"
+uid="uid://cx2yu7n8ierq5"
+path="res://.godot/imported/img.tpsheet-5ef1244b25cbc25f2933ce00d26b9b18.res"
+
+[deps]
+
+files=["res://resources/images/img.sprites/home.tres", "res://resources/images/img.sprites/pause.tres", "res://resources/images/img.sprites/run.tres", "res://resources/images/img.sprites/setting.tres", "res://resources/images/img.sprites/1.tres", "res://resources/images/img.sprites/2.tres", "res://resources/images/img.sprites/3.tres", "res://resources/images/img.sprites/4.tres", "res://resources/images/img.sprites/5.tres", "res://resources/images/img.sprites/6.tres", "res://resources/images/img.sprites/7.tres", "res://resources/images/img.sprites/8.tres", "res://resources/images/img.sprites/error.tres", "res://resources/images/img.sprites/explode.tres", "res://resources/images/img.sprites/flag.tres", "res://resources/images/img.sprites/hide.tres", "res://resources/images/img.sprites/mine.tres", "res://resources/images/img.sprites/question.tres", "res://resources/images/img.sprites/0.tres"]
+
+source_file="res://resources/images/img.tpsheet"
+dest_files=["res://.godot/imported/img.tpsheet-5ef1244b25cbc25f2933ce00d26b9b18.res", "res://resources/images/img.sprites/home.tres", "res://resources/images/img.sprites/pause.tres", "res://resources/images/img.sprites/run.tres", "res://resources/images/img.sprites/setting.tres", "res://resources/images/img.sprites/1.tres", "res://resources/images/img.sprites/2.tres", "res://resources/images/img.sprites/3.tres", "res://resources/images/img.sprites/4.tres", "res://resources/images/img.sprites/5.tres", "res://resources/images/img.sprites/6.tres", "res://resources/images/img.sprites/7.tres", "res://resources/images/img.sprites/8.tres", "res://resources/images/img.sprites/error.tres", "res://resources/images/img.sprites/explode.tres", "res://resources/images/img.sprites/flag.tres", "res://resources/images/img.sprites/hide.tres", "res://resources/images/img.sprites/mine.tres", "res://resources/images/img.sprites/question.tres", "res://resources/images/img.sprites/0.tres"]
+
+[params]
+
