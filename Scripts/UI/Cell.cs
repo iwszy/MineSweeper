@@ -13,6 +13,8 @@ public partial class Cell : Control
     [Signal]
     public delegate void ChordClickedEventHandler();
 
+    public static int PixelSize = 50;
+
     public int GridX { get; set; }
     public int GridY { get; set; }
 
@@ -28,7 +30,7 @@ public partial class Cell : Control
     private static bool _texturesLoaded;
 
     public Cell() {
-        CustomMinimumSize = new Vector2(25, 25);
+        CustomMinimumSize = new Vector2(PixelSize, PixelSize);
         MouseFilter = MouseFilterEnum.Stop;
 
         LoadTexturesOnce();

@@ -6,6 +6,7 @@ namespace MineSweeper;
 public partial class MinefieldView : Control
 {
     private ScrollContainer _scrollContainer = null!;
+    private CenterContainer _centerContainer = null!;
     private GridContainer _gridContainer = null!;
     private Cell[,] _cells = null!;
     private int _width;
@@ -13,21 +14,24 @@ public partial class MinefieldView : Control
 
     public MinefieldView() {
         _scrollContainer = new ScrollContainer();
-        _scrollContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        _scrollContainer.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(_scrollContainer);
 
+        _centerContainer = new CenterContainer();
+        _scrollContainer.AddChild(_centerContainer);
+
         _gridContainer = new GridContainer();
-        _gridContainer.SetAnchorsPreset(Control.LayoutPreset.TopLeft);
-        _scrollContainer.AddChild(_gridContainer);
+        _gridContainer.AddThemeConstantOverride("h_separation", 0);
+        _gridContainer.AddThemeConstantOverride("v_separation", 0);
+        _centerContainer.AddChild(_gridContainer);
     }
 
     public void Build(int width, int height) {
         _width = width;
         _height = height;
 
-        foreach (var child in _gridContainer.GetChildren()) {
+        foreach (var child in _gridContainer.GetChildren())
             child.QueueFree();
-        }
 
         _cells = new Cell[width, height];
         _gridContainer.Columns = width;
@@ -41,17 +45,33 @@ public partial class MinefieldView : Control
                 _gridContainer.AddChild(cell);
             }
         }
+
+        // Let layout update, then ensure the CenterContainer fills the scroll area when grid is small
+        CallDeferred(nameof(AdjustCenterContainer));
+    }
+
+    private void AdjustCenterContainer() {
+        var scrollSize = _scrollContainer.Size;
+        var gridSize = new Vector2(_width * Cell.PixelSize, _height * Cell.PixelSize);
+        _centerContainer.CustomMinimumSize = new Vector2(
+            Mathf.Max(gridSize.X, scrollSize.X),
+            Mathf.Max(gridSize.Y, scrollSize.Y)
+        );
+    }
+
+    public override void _Notification(int what) {
+        if (what == NotificationResized)
+            AdjustCenterContainer();
     }
 
     public Cell? GetCell(int x, int y) {
-        if (x >= 0 && x < _width && y >= 0 && y < _height) {
+        if (x >= 0 && x < _width && y >= 0 && y < _height)
             return _cells[x, y];
-        }
         return null;
     }
 
-    public void UpdateCell(int x, int y, CellState state, int adjacentMines) {
-        GetCell(x, y)?.SetDisplay(state, adjacentMines);
+    public void UpdateCell(int x, int y, CellState display, int adjacentMines) {
+        GetCell(x, y)?.SetDisplay(display, adjacentMines);
     }
 
     public void RevealAllMines(HashSet<Vector2I> minePositions, Vector2I triggeredMine,
@@ -66,13 +86,12 @@ public partial class MinefieldView : Control
                 bool isTriggered = pos == triggeredMine;
                 var display = displayState[x, y];
 
-                if (isTriggered) {
+                if (isTriggered)
                     cell.SetMineTriggered();
-                } else if (isMine && display != CellState.Flagged) {
+                else if (isMine && display != CellState.Flagged)
                     cell.SetDisplay(CellState.Revealed, -1);
-                } else if (!isMine && display == CellState.Flagged) {
+                else if (!isMine && display == CellState.Flagged)
                     cell.SetWrongFlag();
-                }
             }
         }
     }
