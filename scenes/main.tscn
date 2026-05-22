@@ -1,6 +1,121 @@
 [gd_scene format=3 uid="uid://mpavqvq1yuc4"]
 
 [ext_resource type="Script" uid="uid://dm1iftkr8ckcv" path="res://Scripts/App/AppManager.cs" id="1_0"]
+[ext_resource type="FontFile" uid="uid://c8sk0vvp6t401" path="res://resources/fonts/simkai.ttf" id="2_0wfyh"]
+[ext_resource type="Texture2D" uid="uid://1evtv27ox7xf" path="res://resources/images/img.sprites/setting.tres" id="2_sugp2"]
+[ext_resource type="Texture2D" uid="uid://d0l4ooq73mave" path="res://resources/images/img.sprites/home.tres" id="4_jyhfs"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_IconNormal"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_IconPressed"]
+bg_color = Color(0.78, 0.78, 0.82, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_IconHover"]
+bg_color = Color(0.9, 0.9, 0.92, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ModeNormal"]
+bg_color = Color(0.85, 0.88, 0.92, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.75, 0.82, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ModePressed"]
+bg_color = Color(0.75, 0.78, 0.85, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.5, 0.65, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ModeHover"]
+bg_color = Color(0.9, 0.93, 0.96, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.6, 0.75, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_AchvNormal"]
+bg_color = Color(0.95, 0.85, 0.65, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.65, 0.3, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_AchvPressed"]
+bg_color = Color(0.85, 0.72, 0.5, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.55, 0.2, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_AchvHover"]
+bg_color = Color(1, 0.92, 0.75, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.78, 0.4, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tbgi4"]
+bg_color = Color(0.85490197, 0.9254902, 0.92156863, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_AchvPanel"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.85, 0.9, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.1)
+shadow_size = 2
+shadow_offset = Vector2(0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jyhfs"]
+bg_color = Color(0, 0, 0, 1)
+border_width_top = 2
+border_color = Color(0.26666668, 0.1882353, 0.1764706, 1)
 
 [node name="AppManager" type="Control" unique_id=226757053]
 layout_mode = 3
@@ -10,3 +125,305 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0")
+
+[node name="ColorRect_BG" type="ColorRect" parent="." unique_id=742823204]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.85490197, 0.9254902, 0.92156863, 1)
+
+[node name="Image_Title" type="TextureRect" parent="." unique_id=1705730654]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -125.0
+offset_top = 50.0
+offset_right = 125.0
+offset_bottom = 140.0
+grow_horizontal = 2
+expand_mode = 1
+
+[node name="Button_Setting" type="Button" parent="." unique_id=20869123]
+layout_mode = 0
+offset_left = 452.0
+offset_top = 92.0
+offset_right = 500.0
+offset_bottom = 140.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_IconNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_IconPressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_IconHover")
+icon = ExtResource("2_sugp2")
+expand_icon = true
+
+[node name="VBoxContainer_ModeButtons" type="VBoxContainer" parent="." unique_id=1447799816]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 200.0
+offset_right = 200.0
+offset_bottom = 240.0
+grow_horizontal = 2
+theme_override_constants/separation = 20
+
+[node name="Control_Mode0Button" type="Control" parent="VBoxContainer_ModeButtons" unique_id=2089434617]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer_ModeButtons/Control_Mode0Button" unique_id=152632793]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.15, 0.55, 0.25, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ModePressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeHover")
+text = "入门"
+
+[node name="Label" type="Label" parent="VBoxContainer_ModeButtons/Control_Mode0Button" unique_id=1803636968]
+layout_mode = 0
+offset_left = 120.0
+offset_right = 400.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.25, 0.35, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control_Mode1Button" type="Control" parent="VBoxContainer_ModeButtons" unique_id=2131382185]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer_ModeButtons/Control_Mode1Button" unique_id=78945802]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.1, 0.4, 0.7, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ModePressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeHover")
+text = "入门"
+
+[node name="Label" type="Label" parent="VBoxContainer_ModeButtons/Control_Mode1Button" unique_id=1933236325]
+layout_mode = 0
+offset_left = 120.0
+offset_right = 400.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.25, 0.35, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control_Mode2Button" type="Control" parent="VBoxContainer_ModeButtons" unique_id=9041129]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer_ModeButtons/Control_Mode2Button" unique_id=1270421746]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.45, 0.15, 0.65, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ModePressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeHover")
+text = "入门"
+
+[node name="Label" type="Label" parent="VBoxContainer_ModeButtons/Control_Mode2Button" unique_id=816760027]
+layout_mode = 0
+offset_left = 120.0
+offset_right = 400.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.25, 0.35, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control_Mode3Button" type="Control" parent="VBoxContainer_ModeButtons" unique_id=1184407586]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer_ModeButtons/Control_Mode3Button" unique_id=1618265936]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.8, 0.35, 0.05, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ModePressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeHover")
+text = "入门"
+
+[node name="Label" type="Label" parent="VBoxContainer_ModeButtons/Control_Mode3Button" unique_id=1704583747]
+layout_mode = 0
+offset_left = 120.0
+offset_right = 400.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.25, 0.35, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control_Mode4Button" type="Control" parent="VBoxContainer_ModeButtons" unique_id=590092083]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer_ModeButtons/Control_Mode4Button" unique_id=1891658471]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.75, 0.05, 0.1, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ModePressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeHover")
+text = "入门"
+
+[node name="Label" type="Label" parent="VBoxContainer_ModeButtons/Control_Mode4Button" unique_id=302605668]
+layout_mode = 0
+offset_left = 120.0
+offset_right = 400.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.25, 0.35, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control_Mode5Button" type="Control" parent="VBoxContainer_ModeButtons" unique_id=1846613611]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer_ModeButtons/Control_Mode5Button" unique_id=2063584225]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.25, 0.25, 0.35, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_ModeNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ModePressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ModeHover")
+text = "自定义"
+
+[node name="Label" type="Label" parent="VBoxContainer_ModeButtons/Control_Mode5Button" unique_id=358654426]
+layout_mode = 0
+offset_left = 120.0
+offset_right = 400.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.25, 0.35, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button_Achievement" type="Button" parent="." unique_id=440693920]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 700.0
+offset_right = 500.0
+offset_bottom = 760.0
+theme_override_colors/font_color = Color(0.35, 0.2, 0.05, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBoxFlat_AchvNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_AchvPressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_AchvHover")
+text = "成就"
+
+[node name="Panel_Achievements" type="Panel" parent="." unique_id=190217508]
+visible = false
+layout_mode = 0
+offset_right = 600.0
+offset_bottom = 800.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_tbgi4")
+
+[node name="Image_Title" type="TextureRect" parent="Panel_Achievements" unique_id=1988465503]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -125.0
+offset_top = 50.0
+offset_right = 125.0
+offset_bottom = 140.0
+grow_horizontal = 2
+expand_mode = 1
+
+[node name="Button_Home" type="Button" parent="Panel_Achievements" unique_id=1909080280]
+layout_mode = 0
+offset_left = 502.0
+offset_top = 92.0
+offset_right = 550.0
+offset_bottom = 140.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_IconNormal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_IconPressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_IconHover")
+icon = ExtResource("4_jyhfs")
+expand_icon = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel_Achievements" unique_id=246494990]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 160.0
+offset_right = 550.0
+offset_bottom = 770.0
+
+[node name="VBoxContainer_Achievements" type="VBoxContainer" parent="Panel_Achievements/ScrollContainer" unique_id=215394402]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Panel_Achievement" type="Panel" parent="Panel_Achievements/ScrollContainer/VBoxContainer_Achievements" unique_id=452107621]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_AchvPanel")
+
+[node name="Label_Name" type="Label" parent="Panel_Achievements/ScrollContainer/VBoxContainer_Achievements/Panel_Achievement" unique_id=813390823]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 490.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.12, 0.12, 0.18, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 30
+text = "时间管理大师"
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Panel_Achievements/ScrollContainer/VBoxContainer_Achievements/Panel_Achievement" unique_id=1732770437]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 45.0
+offset_right = 490.0
+offset_bottom = 49.0
+theme_override_constants/separation = 4
+theme_override_styles/separator = SubResource("StyleBoxFlat_jyhfs")
+
+[node name="Label_Description" type="Label" parent="Panel_Achievements/ScrollContainer/VBoxContainer_Achievements/Panel_Achievement" unique_id=318897957]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 55.0
+offset_right = 490.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0.3, 0.3, 0.35, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 20
+text = "在进阶模式中获胜，且过程中首次点击直接挖开一大片（0格连锁）"
+autowrap_mode = 1
