@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://mpavqvq1yuc4"]
 
-[ext_resource type="Script" path="res://Scripts/GameManager.cs" id="1_tefeu"]
+[ext_resource type="Script" uid="uid://dm1iftkr8ckcv" path="res://Scripts/GameManager.cs" id="1_tefeu"]
 [ext_resource type="FontFile" uid="uid://c8sk0vvp6t401" path="res://resources/fonts/simkai.ttf" id="2_0wfyh"]
 [ext_resource type="Texture2D" uid="uid://1evtv27ox7xf" path="res://resources/images/img.sprites/setting.tres" id="2_sugp2"]
 [ext_resource type="Texture2D" uid="uid://d0l4ooq73mave" path="res://resources/images/img.sprites/home.tres" id="4_jyhfs"]
@@ -798,7 +798,6 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_CancelHover")
 text = "取消"
 
 [node name="GameScreen" type="Control" parent="." unique_id=316224239]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -818,14 +817,10 @@ color = Color(0.85490197, 0.9254902, 0.92156863, 1)
 
 [node name="Button_Home" type="Button" parent="GameScreen" unique_id=131006684]
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -250.0
+offset_left = 50.0
 offset_top = 20.0
-offset_right = -202.0
+offset_right = 98.0
 offset_bottom = 68.0
-grow_horizontal = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_tipki")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_85g3d")
 theme_override_styles/hover = SubResource("StyleBoxFlat_choun")
@@ -849,15 +844,11 @@ icon = ExtResource("6_o6xl0")
 expand_icon = true
 
 [node name="Label_MineCount" type="Label" parent="GameScreen" unique_id=485810645]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -250.0
+layout_mode = 0
+offset_left = 50.0
 offset_top = 85.0
-offset_right = -75.0
+offset_right = 225.0
 offset_bottom = 135.0
-grow_horizontal = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.25, 1)
 theme_override_fonts/font = ExtResource("2_0wfyh")
 theme_override_font_sizes/font_size = 35
@@ -865,15 +856,11 @@ text = "剩余：9999"
 vertical_alignment = 1
 
 [node name="Label_Time" type="Label" parent="GameScreen" unique_id=1021905233]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = 50.0
+layout_mode = 0
+offset_left = 350.0
 offset_top = 85.0
-offset_right = 250.0
+offset_right = 550.0
 offset_bottom = 135.0
-grow_horizontal = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.25, 1)
 theme_override_fonts/font = ExtResource("2_0wfyh")
 theme_override_font_sizes/font_size = 35

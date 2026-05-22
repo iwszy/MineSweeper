@@ -18,6 +18,10 @@ public partial class GameScreen : Control
     private GameMode _currentMode;
     private MinefieldView? _minefieldView;
 
+    // Layout gaps — adjustable before first NewGame() call
+    public int LabelToGridGap = 75;
+    public int ButtonToGridGap = 15;
+
     public bool FlagsEverUsed { get; private set; }
     public int MaxConsecutiveReveals { get; private set; }
     public int MaxChordRevealCount { get; private set; }
@@ -32,6 +36,27 @@ public partial class GameScreen : Control
         _mineCounter = GetNode<Label>("Label_MineCount");
         _timerLabel = GetNode<Label>("Label_Time");
         _newGameButton = GetNode<Button>("Button_NewGame");
+
+        // Pin mine counter to left edge (aligns with grid left)
+        _mineCounter.LayoutMode = 1;
+        _mineCounter.AnchorLeft = 0;
+        _mineCounter.AnchorRight = 0;
+        _mineCounter.OffsetLeft = 50;
+        _mineCounter.OffsetRight = 225;
+
+        // Pin timer to right edge (aligns with grid right)
+        _timerLabel.LayoutMode = 1;
+        _timerLabel.AnchorLeft = 1;
+        _timerLabel.AnchorRight = 1;
+        _timerLabel.OffsetLeft = -200;
+        _timerLabel.OffsetRight = -50;
+
+        // Center button horizontally
+        // _newGameButton.LayoutMode = 1;
+        // _newGameButton.AnchorLeft = 0.5f;
+        // _newGameButton.AnchorRight = 0.5f;
+        // _newGameButton.OffsetLeft = -70;
+        // _newGameButton.OffsetRight = 70;
 
         GetNode<Button>("Button_Home").Pressed += () => {
             if (_logic is { Status: GameStatus.Playing })
@@ -91,9 +116,11 @@ public partial class GameScreen : Control
         _minefieldView.AnchorTop = 0;
         _minefieldView.AnchorRight = 1;
         _minefieldView.AnchorBottom = 1;
-        _minefieldView.OffsetTop = 200;
+        _minefieldView.OffsetTop = 150;
         AddChild(_minefieldView);
         _minefieldView.Build(mode.Width, mode.Height);
+
+        CallDeferred(nameof(PositionControls));
 
         for (int x = 0; x < mode.Width; x++) {
             for (int y = 0; y < mode.Height; y++) {
@@ -111,6 +138,40 @@ public partial class GameScreen : Control
         _timer.Update(delta);
         if (_timer.IsRunning)
             UpdateTimerLabel();
+    }
+
+    public override void _Notification(int what) {
+        if (what == NotificationResized)
+            CallDeferred(nameof(PositionControls));
+    }
+
+    private void PositionControls() {
+        if (_minefieldView == null) return;
+
+        var viewSize = _minefieldView.Size;
+        var gridPixelW = _currentMode.Width * Cell.PixelSize;
+        var gridPixelH = _currentMode.Height * Cell.PixelSize;
+
+        var gridLeft = (viewSize.X - gridPixelW) / 2f;
+        if (gridLeft < 0) gridLeft = 0;
+        var gridTop = (viewSize.Y - gridPixelH) / 2f;
+        if (gridTop < 0) gridTop = 0;
+
+        var labelY = _minefieldView.OffsetTop + gridTop - LabelToGridGap - 50;
+
+        var mineCounterX = _minefieldView.OffsetLeft + gridLeft;
+        var mineCounterY = Mathf.Max(70, labelY);
+        _mineCounter.Position = new Vector2(mineCounterX, mineCounterY);
+
+        var gridRight = _minefieldView.OffsetLeft + gridLeft
+            + Mathf.Min(gridPixelW, viewSize.X);
+        var timeLabelX = gridRight - _timerLabel.Size.X;
+        _timerLabel.Position = new Vector2(timeLabelX, mineCounterY);
+
+        var btnY = Mathf.Max(_minefieldView.OffsetTop + gridTop - ButtonToGridGap - 45, 70);
+        var buttonSizeY = _newGameButton.Size.Y;
+        _newGameButton.OffsetTop = btnY;
+        _newGameButton.OffsetBottom = btnY + buttonSizeY;
     }
 
     private void UpdateTimerLabel() {
