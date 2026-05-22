@@ -8,10 +8,19 @@ public partial class AppManager : Control
     private Panel _achievementPanel = null!;
     private VBoxContainer _achievementContainer = null!;
     private Panel _achievementTemplate = null!;
-    private CustomModeDialog _customModeDialog = null!;
     private ResultDialog _resultDialog = null!;
     private BestTimes _bestTimes = null!;
     private AchievementData _achievementData = null!;
+
+    // Custom mode panel nodes
+    private Panel _customPanel = null!;
+    private SpinBox _spinWidth = null!;
+    private SpinBox _spinHeight = null!;
+    private SpinBox _spinMines = null!;
+    private HSlider _sliderWidth = null!;
+    private HSlider _sliderHeight = null!;
+    private HSlider _sliderMines = null!;
+    private Button _btnCustomConfirm = null!;
 
     private GameMode _lastMode;
 
@@ -70,12 +79,35 @@ public partial class AppManager : Control
         _achievementContainer = scroll.GetNode<VBoxContainer>("VBoxContainer_Achievements");
         _achievementTemplate = _achievementContainer.GetNode<Panel>("Panel_Achievement");
 
-        // Custom mode and result dialogs (Window-based popups)
-        _customModeDialog = new CustomModeDialog();
-        _customModeDialog.CustomModeConfirmed += (w, h, m) =>
-            StartGame(GameMode.Custom(w, h, m));
-        AddChild(_customModeDialog);
+        // Custom mode panel
+        _customPanel = GetNode<Panel>("Panel_Custom");
+        _spinWidth = _customPanel.GetNode<SpinBox>("SpinBox_HonGridCount");
+        _spinHeight = _customPanel.GetNode<SpinBox>("SpinBox_VerGridCount");
+        _spinMines = _customPanel.GetNode<SpinBox>("SpinBox_MineCount");
+        _sliderWidth = _customPanel.GetNode<HSlider>("HSlider_HonGridCount");
+        _sliderHeight = _customPanel.GetNode<HSlider>("HSlider_VerGridCount");
+        _sliderMines = _customPanel.GetNode<HSlider>("HSlider_MineCount");
+        _btnCustomConfirm = _customPanel.GetNode<Button>("Button_Confirm");
 
+        var range = GameMode.CustomRange;
+        SetupCustomSpinSlider(_spinWidth, _sliderWidth, range.MinWidth, range.MaxWidth, 9);
+        SetupCustomSpinSlider(_spinHeight, _sliderHeight, range.MinHeight, range.MaxHeight, 9);
+        SetupCustomSpinSlider(_spinMines, _sliderMines, 1, range.MaxWidth * range.MaxHeight - 1, 10);
+
+        _spinWidth.ValueChanged += _ => UpdateCustomMineMax();
+        _spinHeight.ValueChanged += _ => UpdateCustomMineMax();
+
+        _btnCustomConfirm.Pressed += () => {
+            int w = (int)_spinWidth.Value, h = (int)_spinHeight.Value, m = (int)_spinMines.Value;
+            if (m >= 1 && m < w * h && w * h - m >= 9) {
+                _customPanel.Visible = false;
+                StartGame(GameMode.Custom(w, h, m));
+            }
+        };
+
+        _customPanel.GetNode<Button>("Button_Cancel").Pressed += () => _customPanel.Visible = false;
+
+        // Result dialog (Window-based popup)
         _resultDialog = new ResultDialog();
         _resultDialog.PlayAgainRequested += () => {
             _resultDialog.Visible = false;
@@ -97,7 +129,32 @@ public partial class AppManager : Control
     }
 
     private void ShowCustomModeDialog() {
-        _customModeDialog.ShowDialog();
+        _spinWidth.Value = 9;
+        _spinHeight.Value = 9;
+        _spinMines.Value = 10;
+        _customPanel.Visible = true;
+    }
+
+    private static void SetupCustomSpinSlider(SpinBox spin, HSlider slider, int min, int max, int def) {
+        spin.MinValue = min;
+        spin.MaxValue = max;
+        spin.Value = def;
+        slider.MinValue = min;
+        slider.MaxValue = max;
+        slider.Value = def;
+        spin.ValueChanged += v => slider.Value = v;
+        slider.ValueChanged += v => spin.Value = v;
+    }
+
+    private void UpdateCustomMineMax() {
+        int w = (int)_spinWidth.Value;
+        int h = (int)_spinHeight.Value;
+        int maxMines = w * h - 1;
+        _spinMines.MaxValue = maxMines;
+        _spinMines.Suffix = $" / {maxMines}";
+        _sliderMines.MaxValue = maxMines;
+        if (_spinMines.Value > maxMines)
+            _spinMines.Value = maxMines;
     }
 
     private void ShowAchievements() {
