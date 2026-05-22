@@ -18,6 +18,7 @@ public class GameLogic
     public CellState[,] DisplayState { get; }
     public GameStatus Status { get; private set; } = GameStatus.Playing;
     public int FlagCount { get; private set; }
+    private int _unrevealedSafeCells;
 
     public event Action<Vector2I, int>? CellRevealed;
     public event Action<Vector2I>? MineHit;
@@ -28,6 +29,7 @@ public class GameLogic
     public GameLogic(GameMode mode) {
         Model = new MinefieldModel(mode.Width, mode.Height, mode.MineCount);
         DisplayState = new CellState[mode.Width, mode.Height];
+        _unrevealedSafeCells = mode.TotalCells - mode.MineCount;
     }
 
     public void RevealCell(int x, int y) {
@@ -58,6 +60,7 @@ public class GameLogic
         int adjacent = Model.AdjacentMineCounts[x, y];
         if (adjacent > 0) {
             DisplayState[x, y] = CellState.Revealed;
+            _unrevealedSafeCells--;
             CellRevealed?.Invoke(new Vector2I(x, y), adjacent);
         } else {
             var revealedCells = new List<Vector2I>();
@@ -94,10 +97,14 @@ public class GameLogic
                 }
             }
 
+            _unrevealedSafeCells -= revealedCells.Count;
             CellsRevealedBatch?.Invoke(revealedCells);
         }
 
-        CheckWin();
+        if (_unrevealedSafeCells <= 0) {
+            Status = GameStatus.Won;
+            GameWon?.Invoke();
+        }
     }
 
     public void ToggleFlag(int x, int y) {
@@ -162,20 +169,4 @@ public class GameLogic
         }
     }
 
-    private void CheckWin() {
-        if (Status != GameStatus.Playing) {
-            return;
-        }
-
-        for (int x = 0; x < Model.Width; x++) {
-            for (int y = 0; y < Model.Height; y++) {
-                if (!Model.MineMap[x, y] && DisplayState[x, y] != CellState.Revealed) {
-                    return;
-                }
-            }
-        }
-
-        Status = GameStatus.Won;
-        GameWon?.Invoke();
-    }
 }
