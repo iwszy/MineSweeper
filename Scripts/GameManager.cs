@@ -2,8 +2,9 @@ using Godot;
 
 namespace MineSweeper;
 
-public partial class AppManager : Control
+public partial class GameManager : Control
 {
+    private Control _mainMenu = null!;
     private GameScreen _gameScreen = null!;
     private Panel _achievementPanel = null!;
     private VBoxContainer _achievementContainer = null!;
@@ -12,7 +13,6 @@ public partial class AppManager : Control
     private BestTimes _bestTimes = null!;
     private AchievementData _achievementData = null!;
 
-    // Custom mode panel nodes
     private Panel _customPanel = null!;
     private SpinBox _spinWidth = null!;
     private SpinBox _spinHeight = null!;
@@ -23,8 +23,6 @@ public partial class AppManager : Control
     private Button _btnCustomConfirm = null!;
 
     private GameMode _lastMode;
-
-    // Mode row nodes (0-4 presets, 5 custom)
     private Button[] _modeButtons = new Button[6];
     private Label[] _modeLabels = new Label[6];
 
@@ -35,52 +33,42 @@ public partial class AppManager : Control
         _achievementData = new AchievementData();
         _achievementData.Load();
 
-        // Load GameScreen from scene
-        var gameScene = ResourceLoader.Load<PackedScene>("res://scenes/game_screen.tscn");
-        _gameScreen = gameScene.Instantiate<GameScreen>();
+        _mainMenu = GetNode<Control>("MainMenu");
+        _gameScreen = GetNode<GameScreen>("GameScreen");
         _gameScreen.GameEnded += OnGameEnded;
         _gameScreen.BackRequested += OnBackFromGame;
         _gameScreen.Visible = false;
-        AddChild(_gameScreen);
 
-        // Wire settings button
-        GetNode<Button>("Button_Setting").Pressed += () =>
+        GetNode<Button>("MainMenu/Button_Setting").Pressed += () =>
             GD.Print("Settings not implemented");
 
-        // Wire mode buttons
         var presets = GameMode.Presets;
         for (int i = 0; i < 6; i++) {
-            var row = GetNode<Control>($"VBoxContainer_ModeButtons/Control_Mode{i}Button");
+            var row = GetNode<Control>($"MainMenu/VBoxContainer_ModeButtons/Control_Mode{i}Button");
             _modeButtons[i] = row.GetNode<Button>("Button");
             _modeLabels[i] = row.GetNode<Label>("Label");
 
             if (i < presets.Length) {
                 var mode = presets[i];
                 _modeButtons[i].Text = mode.Name;
-                var captured = mode;
-                _modeButtons[i].Pressed += () => StartGame(captured);
+                _modeButtons[i].Pressed += () => StartGame(mode);
             } else {
-                // Custom mode button (index 5)
                 _modeButtons[i].Pressed += ShowCustomModeDialog;
             }
         }
 
         RefreshBestTimes();
 
-        // Wire achievement button
-        _achievementPanel = GetNode<Panel>("Panel_Achievements");
-        _achievementPanel.GetNode<Button>("Button_Home").Pressed += () => {
-            _achievementPanel.Visible = false;
-        };
-        GetNode<Button>("Button_Achievement").Pressed += ShowAchievements;
+        _achievementPanel = GetNode<Panel>("MainMenu/Panel_Achievements");
+        _achievementPanel.GetNode<Button>("Button_Home").Pressed += () =>
+            HideAchievements();
+        GetNode<Button>("MainMenu/Button_Achievement").Pressed += ShowAchievements;
 
-        // Capture the template panel (first child of VBoxContainer)
         var scroll = _achievementPanel.GetNode<ScrollContainer>("ScrollContainer");
         _achievementContainer = scroll.GetNode<VBoxContainer>("VBoxContainer_Achievements");
         _achievementTemplate = _achievementContainer.GetNode<Panel>("Panel_Achievement");
 
-        // Custom mode panel
-        _customPanel = GetNode<Panel>("Panel_Custom");
+        _customPanel = GetNode<Panel>("MainMenu/Panel_Custom");
         _spinWidth = _customPanel.GetNode<SpinBox>("SpinBox_HonGridCount");
         _spinHeight = _customPanel.GetNode<SpinBox>("SpinBox_VerGridCount");
         _spinMines = _customPanel.GetNode<SpinBox>("SpinBox_MineCount");
@@ -104,10 +92,9 @@ public partial class AppManager : Control
                 StartGame(GameMode.Custom(w, h, m));
             }
         };
+        _customPanel.GetNode<Button>("Button_Cancel").Pressed += () =>
+            _customPanel.Visible = false;
 
-        _customPanel.GetNode<Button>("Button_Cancel").Pressed += () => _customPanel.Visible = false;
-
-        // Result dialog (Window-based popup)
         _resultDialog = new ResultDialog();
         _resultDialog.PlayAgainRequested += () => {
             _resultDialog.Visible = false;
@@ -116,6 +103,7 @@ public partial class AppManager : Control
         _resultDialog.BackToMenuRequested += () => {
             _resultDialog.Visible = false;
             _gameScreen.Visible = false;
+            _mainMenu.Visible = true;
             RefreshBestTimes();
         };
         AddChild(_resultDialog);
@@ -124,6 +112,7 @@ public partial class AppManager : Control
     private void StartGame(GameMode mode) {
         _lastMode = mode;
         _achievementPanel.Visible = false;
+        _mainMenu.Visible = false;
         _gameScreen.Visible = true;
         _gameScreen.NewGame(mode);
     }
@@ -158,7 +147,6 @@ public partial class AppManager : Control
     }
 
     private void ShowAchievements() {
-        // Clear old panels (keep the template, which is the last child)
         var children = _achievementContainer.GetChildren();
         for (int i = children.Count - 1; i >= 0; i--) {
             if (children[i] != _achievementTemplate)
@@ -169,14 +157,17 @@ public partial class AppManager : Control
         foreach (var def in AchievementDef.All) {
             var panel = (Panel)_achievementTemplate.Duplicate();
             panel.Visible = true;
-            panel.GetNode<Label>("Label_Name").Text = _achievementData.IsUnlocked(def.Id)
-                ? def.Name : "???";
-            panel.GetNode<Label>("Label_Description").Text = _achievementData.IsUnlocked(def.Id)
-                ? def.Description : "达成条件隐藏";
+            panel.GetNode<Label>("Label_Name").Text =
+                _achievementData.IsUnlocked(def.Id) ? def.Name : "???";
+            panel.GetNode<Label>("Label_Description").Text =
+                _achievementData.IsUnlocked(def.Id) ? def.Description : "达成条件隐藏";
             _achievementContainer.AddChild(panel);
         }
-
         _achievementPanel.Visible = true;
+    }
+
+    private void HideAchievements() {
+        _achievementPanel.Visible = false;
     }
 
     private void RefreshBestTimes() {
@@ -191,6 +182,7 @@ public partial class AppManager : Control
 
     private void OnBackFromGame() {
         _gameScreen.Visible = false;
+        _mainMenu.Visible = true;
         RefreshBestTimes();
     }
 
