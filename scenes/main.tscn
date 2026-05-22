@@ -124,6 +124,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_0")
 
 [node name="ColorRect_BG" type="ColorRect" parent="." unique_id=742823204]
@@ -148,11 +150,15 @@ grow_horizontal = 2
 expand_mode = 1
 
 [node name="Button_Setting" type="Button" parent="." unique_id=20869123]
-layout_mode = 0
-offset_left = 452.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 152.0
 offset_top = 92.0
-offset_right = 500.0
+offset_right = 200.0
 offset_bottom = 140.0
+grow_horizontal = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_IconNormal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_IconPressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_IconHover")
@@ -161,14 +167,17 @@ expand_icon = true
 
 [node name="VBoxContainer_ModeButtons" type="VBoxContainer" parent="." unique_id=1447799816]
 layout_mode = 1
-anchors_preset = 5
+anchors_preset = 8
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
+anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = 200.0
+offset_top = -200.0
 offset_right = 200.0
-offset_bottom = 240.0
+offset_bottom = 260.0
 grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 20
 
 [node name="Control_Mode0Button" type="Control" parent="VBoxContainer_ModeButtons" unique_id=2089434617]
@@ -334,11 +343,18 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Button_Achievement" type="Button" parent="." unique_id=440693920]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 700.0
-offset_right = 500.0
-offset_bottom = 760.0
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
 theme_override_colors/font_color = Color(0.35, 0.2, 0.05, 1)
 theme_override_fonts/font = ExtResource("2_0wfyh")
 theme_override_font_sizes/font_size = 35
@@ -367,11 +383,15 @@ grow_horizontal = 2
 expand_mode = 1
 
 [node name="Button_Home" type="Button" parent="Panel_Achievements" unique_id=1909080280]
-layout_mode = 0
-offset_left = 502.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 202.0
 offset_top = 92.0
-offset_right = 550.0
+offset_right = 250.0
 offset_bottom = 140.0
+grow_horizontal = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_IconNormal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_IconPressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_IconHover")
@@ -379,11 +399,15 @@ icon = ExtResource("4_jyhfs")
 expand_icon = true
 
 [node name="ScrollContainer" type="ScrollContainer" parent="Panel_Achievements" unique_id=246494990]
-layout_mode = 0
-offset_left = 50.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
 offset_top = 160.0
-offset_right = 550.0
+offset_right = 250.0
 offset_bottom = 770.0
+grow_horizontal = 2
 
 [node name="VBoxContainer_Achievements" type="VBoxContainer" parent="Panel_Achievements/ScrollContainer" unique_id=215394402]
 custom_minimum_size = Vector2(500, 0)
