@@ -196,16 +196,7 @@ public partial class AppManager : Control
 
     private void OnGameEnded(bool won, double time, GameMode mode) {
         var logic = _gameScreen.CurrentLogic;
-
-        bool allMinesFlagged = false;
-        if (won && logic != null) {
-            allMinesFlagged = true;
-            for (int x = 0; x < logic.Model.Width; x++)
-                for (int y = 0; y < logic.Model.Height; y++)
-                    if (logic.Model.MineMap[x, y]
-                        && logic.DisplayState[x, y] != CellState.Flagged)
-                        allMinesFlagged = false;
-        }
+        bool allMinesFlagged = won && logic is { AllMinesFlagged: true };
 
         var newAchievements = _achievementData.CheckOnGameEnd(
             won, mode, time,

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 namespace MineSweeper;
@@ -19,6 +18,9 @@ public class GameLogic
     public GameStatus Status { get; private set; } = GameStatus.Playing;
     public int FlagCount { get; private set; }
     private int _unrevealedSafeCells;
+    private int _unflaggedMineCount;
+
+    public bool AllMinesFlagged => _unflaggedMineCount == 0;
 
     public event Action<Vector2I, int>? CellRevealed;
     public event Action<Vector2I>? MineHit;
@@ -30,6 +32,7 @@ public class GameLogic
         Model = new MinefieldModel(mode.Width, mode.Height, mode.MineCount);
         DisplayState = new CellState[mode.Width, mode.Height];
         _unrevealedSafeCells = mode.TotalCells - mode.MineCount;
+        _unflaggedMineCount = mode.MineCount;
     }
 
     public void RevealCell(int x, int y) {
@@ -90,10 +93,10 @@ public class GameLogic
                 int adj = Model.AdjacentMineCounts[cx, cy];
 
                 if (adj == 0) {
-                    foreach (var n in Model.GetNeighbors(cx, cy).Where(n => DisplayState[n.X, n.Y] != CellState.Revealed
-                                                                            && DisplayState[n.X, n.Y] != CellState.Flagged)) {
-                        queue.Enqueue(n);
-                    }
+                    foreach (var n in Model.GetNeighbors(cx, cy))
+                        if (DisplayState[n.X, n.Y] != CellState.Revealed
+                            && DisplayState[n.X, n.Y] != CellState.Flagged)
+                            queue.Enqueue(n);
                 }
             }
 
@@ -130,9 +133,11 @@ public class GameLogic
 
         if (oldState == CellState.Flagged) {
             FlagCount--;
+            if (Model.MineMap[x, y]) _unflaggedMineCount++;
         }
         if (newState == CellState.Flagged) {
             FlagCount++;
+            if (Model.MineMap[x, y]) _unflaggedMineCount--;
         }
 
         FlagChanged?.Invoke(new Vector2I(x, y), newState);
@@ -157,15 +162,18 @@ public class GameLogic
             return;
         }
 
-        int flagCount = Model.GetNeighbors(x, y).Count(n => DisplayState[n.X, n.Y] == CellState.Flagged);
+        int flagCount = 0;
+        foreach (var n in Model.GetNeighbors(x, y))
+            if (DisplayState[n.X, n.Y] == CellState.Flagged)
+                flagCount++;
 
         if (flagCount != adjacentMines) return;
 
-        foreach (var n in Model.GetNeighbors(x, y).Where(n => DisplayState[n.X, n.Y] != CellState.Flagged).Where(n => DisplayState[n.X, n.Y] != CellState.Revealed)) {
+        foreach (var n in Model.GetNeighbors(x, y)) {
+            if (DisplayState[n.X, n.Y] == CellState.Flagged) continue;
+            if (DisplayState[n.X, n.Y] == CellState.Revealed) continue;
             RevealCell(n.X, n.Y);
-            if (Status == GameStatus.Lost) {
-                return;
-            }
+            if (Status == GameStatus.Lost) return;
         }
     }
 

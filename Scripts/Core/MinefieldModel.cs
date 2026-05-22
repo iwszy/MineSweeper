@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 namespace MineSweeper;
@@ -16,6 +15,11 @@ public class MinefieldModel
     public int[,] AdjacentMineCounts { get; private set; }
     public HashSet<Vector2I> MinePositions { get; } = new();
 
+    // Pre-computed neighbor lists — shared across instances with same dimensions.
+    // Only preset modes are cached (~1 MB total); custom dimensions rebuild each game.
+    private static readonly Dictionary<(int, int), List<Vector2I>[,]> _sharedCaches = new();
+    private List<Vector2I>[,] _neighborCache = null!;
+
     private readonly Random _random = new();
 
     public MinefieldModel(int width, int height, int mineCount) {
@@ -24,28 +28,51 @@ public class MinefieldModel
         MineCount = mineCount;
         MineMap = new bool[width, height];
         AdjacentMineCounts = new int[width, height];
+        _neighborCache = GetOrBuildCache(width, height);
+    }
+
+    private static List<Vector2I>[,] GetOrBuildCache(int w, int h) {
+        foreach (var mode in GameMode.Presets)
+            if (mode.Width == w && mode.Height == h)
+                return GetOrBuildPresetCache(w, h);
+
+        return BuildCache(w, h);
+    }
+
+    private static List<Vector2I>[,] GetOrBuildPresetCache(int w, int h) {
+        var key = (w, h);
+        if (_sharedCaches.TryGetValue(key, out var cached))
+            return cached;
+
+        var cache = BuildCache(w, h);
+        _sharedCaches[key] = cache;
+        return cache;
+    }
+
+    private static List<Vector2I>[,] BuildCache(int w, int h) {
+        var cache = new List<Vector2I>[w, h];
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                var list = new List<Vector2I>(8);
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        if (dx == 0 && dy == 0) continue;
+                        int nx = x + dx, ny = y + dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h)
+                            list.Add(new Vector2I(nx, ny));
+                    }
+                }
+                cache[x, y] = list;
+            }
+        }
+        return cache;
     }
 
     public bool IsInBounds(int x, int y)
         => x >= 0 && x < Width && y >= 0 && y < Height;
 
-    public List<Vector2I> GetNeighbors(int x, int y) {
-        var neighbors = new List<Vector2I>(8);
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) {
-                    continue;
-                }
-                int nx = x + dx;
-                int ny = y + dy;
-                if (IsInBounds(nx, ny)) {
-                    neighbors.Add(new Vector2I(nx, ny));
-                }
-            }
-        }
-
-        return neighbors;
-    }
+    public List<Vector2I> GetNeighbors(int x, int y)
+        => _neighborCache[x, y];
 
     public void PlaceMines(Vector2I safeCell) {
         var safeZone = new HashSet<Vector2I> { safeCell };
@@ -100,7 +127,9 @@ public class MinefieldModel
                 if (MineMap[x, y]) {
                     AdjacentMineCounts[x, y] = -1;
                 } else {
-                    int count = GetNeighbors(x, y).Count(nb => MineMap[nb.X, nb.Y]);
+                    int count = 0;
+                    foreach (var nb in _neighborCache[x, y])
+                        if (MineMap[nb.X, nb.Y]) count++;
                     AdjacentMineCounts[x, y] = count;
                 }
             }
