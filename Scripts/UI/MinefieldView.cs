@@ -8,6 +8,7 @@ public partial class MinefieldView : Control
     private ScrollContainer _scrollContainer = null!;
     private CenterContainer _centerContainer = null!;
     private GridContainer _gridContainer = null!;
+    private ColorRect _mask;
     private Cell[,] _cells = null!;
     private int _width;
     private int _height;
@@ -24,14 +25,22 @@ public partial class MinefieldView : Control
         _gridContainer.AddThemeConstantOverride("h_separation", 0);
         _gridContainer.AddThemeConstantOverride("v_separation", 0);
         _centerContainer.AddChild(_gridContainer);
+        _mask = new ColorRect();
+        _mask.Color = new Color(0, 0, 0, 0);
+        _mask.LayoutMode = 1;
+        _mask.SetAnchorsPreset(LayoutPreset.FullRect);
+        _mask.Visible = false;
+        _mask.MouseFilter = MouseFilterEnum.Stop;
+        _centerContainer.AddChild(_mask);
     }
 
     public void Build(int width, int height) {
         _width = width;
         _height = height;
 
-        foreach (var child in _gridContainer.GetChildren())
+        foreach (var child in _gridContainer.GetChildren()) {
             child.QueueFree();
+        }
 
         _cells = new Cell[width, height];
         _gridContainer.Columns = width;
@@ -57,16 +66,21 @@ public partial class MinefieldView : Control
             Mathf.Max(gridSize.X, scrollSize.X),
             Mathf.Max(gridSize.Y, scrollSize.Y)
         );
+        _mask.CustomMinimumSize = _centerContainer.CustomMinimumSize;
     }
 
     public override void _Notification(int what) {
-        if (what == NotificationResized)
+        if (what == NotificationResized) {
             AdjustCenterContainer();
+        }
     }
+    
+    public void SetPause(bool paused) => _mask.Visible = paused; 
 
     public Cell? GetCell(int x, int y) {
-        if (x >= 0 && x < _width && y >= 0 && y < _height)
+        if (x >= 0 && x < _width && y >= 0 && y < _height) {
             return _cells[x, y];
+        }
         return null;
     }
 
@@ -86,12 +100,13 @@ public partial class MinefieldView : Control
                 bool isTriggered = pos == triggeredMine;
                 var display = displayState[x, y];
 
-                if (isTriggered)
+                if (isTriggered) {
                     cell.SetMineTriggered();
-                else if (isMine && display != CellState.Flagged)
+                } else if (isMine && display != CellState.Flagged) {
                     cell.SetDisplay(CellState.Revealed, -1);
-                else if (!isMine && display == CellState.Flagged)
+                } else if (!isMine && display == CellState.Flagged) {
                     cell.SetWrongFlag();
+                }
             }
         }
     }

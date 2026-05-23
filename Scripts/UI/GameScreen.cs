@@ -18,6 +18,12 @@ public partial class GameScreen : Control
     private GameMode _currentMode;
     private MinefieldView? _minefieldView;
 
+    // Pause state
+    private bool _isPaused;
+    private Button _runPauseBtn = null!;
+    private Texture2D? _pauseIcon;
+    private Texture2D? _runIcon;
+
     // Layout gaps — adjustable before first NewGame() call
     public int LabelToGridGap = 75;
     public int ButtonToGridGap = 15;
@@ -30,7 +36,6 @@ public partial class GameScreen : Control
 
     private int CurrentConsecutiveReveals { get; set; }
     private int _pendingRevealCount;
-    private bool _justFirstClicked;
 
     // Win animation state
     private bool _animating;
@@ -50,6 +55,7 @@ public partial class GameScreen : Control
         _timerLabel = GetNode<Label>("Label_Time");
         _newGameButton = GetNode<Button>("Button_NewGame");
         _timerLabel.GetNode<TextureRect>("Image_NewBestTime").Visible = false;
+        _stampImage = _timerLabel.GetNode<TextureRect>("Image_NewBestTime")!;
 
         // Pin mine counter to left edge (aligns with grid left)
         _mineCounter.LayoutMode = 1;
@@ -66,26 +72,39 @@ public partial class GameScreen : Control
         _timerLabel.OffsetRight = -50;
 
         GetNode<Button>("Button_Home").Pressed += () => {
-            if (_logic is { Status: GameStatus.Playing })
+            if (_logic is { Status: GameStatus.Playing }) {
                 _timer.Stop();
+            }
             BackRequested?.Invoke();
         };
+
+        _runPauseBtn = GetNode<Button>("Button_RunPause");
+        _pauseIcon = GD.Load<Texture2D>("res://resources/images/img.sprites/pause.tres");
+        _runIcon = GD.Load<Texture2D>("res://resources/images/img.sprites/run.tres");
+        _runPauseBtn.Pressed += TogglePause;
 
         _newGameButton.Pressed += RestartGame;
     }
 
     public override void _UnhandledInput(InputEvent @event) {
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed) {
-            if (keyEvent.Keycode == Key.F2)
-                RestartGame();
-            else if (keyEvent.Keycode == Key.Escape)
-                GetNode<Button>("Button_Home").EmitSignal("pressed");
+        if (@event is InputEventKey { Pressed: true } keyEvent) {
+            switch (keyEvent.Keycode) {
+                case Key.F2:
+                    RestartGame();
+                    break;
+                case Key.Escape:
+                    GetNode<Button>("Button_Home").EmitSignal("pressed");
+                    break;
+            }
         }
     }
 
     public void NewGame(GameMode mode) {
         _currentMode = mode;
         _timer.Reset();
+        if (_stampImage != null) _stampImage.Visible = false;
+        _isPaused = false;
+        _runPauseBtn.Icon = _pauseIcon;
         UpdateTimerLabel();
         UpdateMineCounter(mode.MineCount);
 
@@ -95,7 +114,6 @@ public partial class GameScreen : Control
         MaxChordRevealCount = 0;
         FirstClickRevealCount = 0;
         _pendingRevealCount = 0;
-        _justFirstClicked = false;
 
         if (_logic != null) {
             _logic.CellRevealed -= OnCellRevealed;
@@ -125,6 +143,7 @@ public partial class GameScreen : Control
         _minefieldView.AnchorBottom = 1;
         _minefieldView.OffsetTop = 150;
         AddChild(_minefieldView);
+        MoveChild(_newGameButton, GetChildCount() - 1);
         _minefieldView.Build(mode.Width, mode.Height);
 
         CallDeferred(nameof(PositionControls));
@@ -139,23 +158,30 @@ public partial class GameScreen : Control
                 cell.ChordClicked += () => OnCellChordClicked(cx, cy);
             }
         }
+        _timer.Start();
     }
 
     public override void _Process(double delta) {
+        if (_isPaused) return;
+
         _timer.Update(delta);
-        if (_timer.IsRunning)
+        if (_timer.IsRunning) {
             UpdateTimerLabel();
+        }
 
-        if (_animating)
+        if (_animating) {
             AnimateScanline((float)delta);
+        }
 
-        if (_stampAnimating)
+        if (_stampAnimating) {
             AnimateStamp((float)delta);
+        }
     }
 
     public override void _Notification(int what) {
-        if (what == NotificationResized)
+        if (what == NotificationResized) {
             CallDeferred(nameof(PositionControls));
+        }
     }
 
     private void PositionControls() {
@@ -199,17 +225,24 @@ public partial class GameScreen : Control
         NewGame(_currentMode);
     }
 
+    private void TogglePause() {
+        _isPaused = !_isPaused;
+        if (_isPaused) {
+            _timer.Stop();
+            _runPauseBtn.Icon = _runIcon;
+        } else {
+            _timer.Start();
+            _runPauseBtn.Icon = _pauseIcon;
+        }
+        _minefieldView.SetPause(_isPaused);
+    }
+
     private void OnCellLeftClicked(int x, int y) {
         if (_logic == null) {
             return;
         }
-        _justFirstClicked = !_logic.Model.MinesPlaced;
         _pendingRevealCount = 0;
         _logic.RevealCell(x, y);
-        if (_justFirstClicked && _logic.Status == GameStatus.Playing) {
-            _timer.Start();
-        }
-        _justFirstClicked = false;
     }
 
     private void OnCellRightClicked(int x, int y) {
@@ -245,24 +278,25 @@ public partial class GameScreen : Control
 
         _pendingRevealCount += cells.Count;
         CurrentConsecutiveReveals += cells.Count;
-        if (CurrentConsecutiveReveals > MaxConsecutiveReveals)
+        if (CurrentConsecutiveReveals > MaxConsecutiveReveals) {
             MaxConsecutiveReveals = CurrentConsecutiveReveals;
-        if (_justFirstClicked) {
-            FirstClickRevealCount = cells.Count;
-            _justFirstClicked = false;
         }
     }
 
     private void OnMineHit(Vector2I pos) {
-        if (_logic == null || _minefieldView == null) return;
+        if (_logic == null || _minefieldView == null) {
+            return;
+        }
         _timer.Stop();
         _minefieldView.RevealAllMines(_logic.Model.MinePositions, pos, _logic.DisplayState);
-        DisableAllCells();
+        _minefieldView.SetPause(true);
         GameEnded?.Invoke(false, _timer.Elapsed, _currentMode);
     }
 
     private void OnGameWon() {
-        if (_logic == null || _minefieldView == null) return;
+        if (_logic == null || _minefieldView == null) {
+            return;
+        }
         _timer.Stop();
         _animating = true;
         _scanRow = _currentMode.Height;
@@ -281,12 +315,14 @@ public partial class GameScreen : Control
         _scanTrailBar.Size = new Vector2(_minefieldView.Size.X, 50);
         _scanTrailBar.MouseFilter = MouseFilterEnum.Ignore;
         _minefieldView.AddChild(_scanTrailBar);
+        _minefieldView.SetPause(true);
     }
 
     private void OnFlagChanged(Vector2I pos, CellState newState) {
         _minefieldView?.UpdateCell(pos.X, pos.Y, newState, -1);
-        if (_logic != null)
+        if (_logic != null) {
             UpdateMineCounter(_currentMode.MineCount - _logic.FlagCount);
+        }
     }
 
     private void AnimateScanline(float delta) {
@@ -333,16 +369,14 @@ public partial class GameScreen : Control
             _scanlineBar = null;
             _scanTrailBar?.QueueFree();
             _scanTrailBar = null;
-            DisableAllCells();
             GameEnded?.Invoke(true, _timer.Elapsed, _currentMode);
         }
     }
 
     public void PlayStampAnimation() {
+        if (_stampImage == null) return;
         _stampAnimating = true;
         _stampProgress = 0f;
-
-        _stampImage = _timerLabel.GetNode<TextureRect>("Image_NewBestTime");
         _stampImage.Visible = true;
 
         // Start large — stamp is raised
@@ -373,17 +407,6 @@ public partial class GameScreen : Control
         if (_stampProgress >= 1f) {
             _stampImage.Scale = Vector2.One;
             _stampAnimating = false;
-        }
-    }
-
-    private void DisableAllCells() {
-        if (_minefieldView == null) return;
-        for (int x = 0; x < _currentMode.Width; x++) {
-            for (int y = 0; y < _currentMode.Height; y++) {
-                if (_minefieldView.GetCell(x, y) is { } cell) {
-                    cell.MouseFilter = MouseFilterEnum.Ignore;
-                }
-            }
         }
     }
 }
