@@ -123,7 +123,7 @@ border_width_top = 2
 border_color = Color(0.26666668, 0.1882353, 0.1764706, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_CustomPanel"]
-bg_color = Color(0.7137255, 0.92156863, 1, 1)
+bg_color = Color(0.78, 0.912, 1, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -868,6 +868,23 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_choun")
 icon = ExtResource("6_o6xl0")
 expand_icon = true
 
+[node name="Label_ModeName" type="Label" parent="GameScreen" unique_id=1723287862]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -190.0
+offset_top = 20.0
+offset_right = -50.0
+offset_bottom = 70.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.2, 0.2, 0.25, 1)
+theme_override_fonts/font = ExtResource("2_0wfyh")
+theme_override_font_sizes/font_size = 35
+text = "大师"
+horizontal_alignment = 2
+vertical_alignment = 1
+
 [node name="Label_MineCount" type="Label" parent="GameScreen" unique_id=485810645]
 layout_mode = 0
 offset_left = 50.0
@@ -928,6 +945,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_NewGameHover")
 text = "再来一局"
 
 [node name="Panel_NewAchievement" type="Panel" parent="." unique_id=1963538433]
+visible = false
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5

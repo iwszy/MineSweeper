@@ -11,6 +11,7 @@ public partial class GameScreen : Control
 
     private Label _mineCounter = null!;
     private Label _timerLabel = null!;
+    private Label _modeName = null!;
     private Button _newGameButton = null!;
 
     private GameLogic? _logic;
@@ -53,6 +54,7 @@ public partial class GameScreen : Control
     public override void _Ready() {
         _mineCounter = GetNode<Label>("Label_MineCount");
         _timerLabel = GetNode<Label>("Label_Time");
+        _modeName = GetNode<Label>("Label_ModeName");
         _newGameButton = GetNode<Button>("Button_NewGame");
         _timerLabel.GetNode<TextureRect>("Image_NewBestTime").Visible = false;
         _stampImage = _timerLabel.GetNode<TextureRect>("Image_NewBestTime")!;
@@ -101,6 +103,8 @@ public partial class GameScreen : Control
 
     public void NewGame(GameMode mode) {
         _currentMode = mode;
+        _modeName.Text = mode.Name;
+        _modeName.AddThemeColorOverride("font_color", ModeLabelColor(mode.Name));
         _timer.Reset();
         if (_stampImage != null) _stampImage.Visible = false;
         _isPaused = false;
@@ -188,13 +192,17 @@ public partial class GameScreen : Control
         if (_minefieldView == null) return;
 
         var viewSize = _minefieldView.Size;
-        var gridPixelW = _currentMode.Width * Cell.PixelSize;
-        var gridPixelH = _currentMode.Height * Cell.PixelSize;
+        var gridPixelW = Mathf.Max(_currentMode.Width, 9) * Cell.PixelSize;
+        var gridPixelH = Mathf.Max(_currentMode.Height, 9) * Cell.PixelSize;
 
         var gridLeft = (viewSize.X - gridPixelW) / 2f;
-        if (gridLeft < 0) gridLeft = 0;
+        if (gridLeft < 0) {
+            gridLeft = 0;
+        }
         var gridTop = (viewSize.Y - gridPixelH) / 2f;
-        if (gridTop < 0) gridTop = 0;
+        if (gridTop < 0) {
+            gridTop = 0;
+        }
 
         var labelY = _minefieldView.OffsetTop + gridTop - LabelToGridGap - 50;
 
@@ -216,6 +224,15 @@ public partial class GameScreen : Control
     private void UpdateTimerLabel() {
         _timerLabel.Text = _timer.Formatted;
     }
+
+    private static Color ModeLabelColor(string name) => name switch {
+        "入门" => new Color(0.15f, 0.55f, 0.25f, 1f),
+        "普通" => new Color(0.1f, 0.4f, 0.7f, 1f),
+        "进阶" => new Color(0.45f, 0.15f, 0.65f, 1f),
+        "大师" => new Color(0.8f, 0.35f, 0.05f, 1f),
+        "超凡" => new Color(0.75f, 0.05f, 0.1f, 1f),
+        _ => new Color(0.25f, 0.25f, 0.35f, 1f),
+    };
 
     private void UpdateMineCounter(int count) {
         _mineCounter.Text = $"剩余：{count}";

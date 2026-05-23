@@ -120,6 +120,7 @@ public partial class GameManager : Control
         _spinWidth.Value = 9;
         _spinHeight.Value = 9;
         _spinMines.Value = 10;
+        UpdateCustomMineMax();
         _customPanel.Visible = true;
     }
 
@@ -137,7 +138,8 @@ public partial class GameManager : Control
     private void UpdateCustomMineMax() {
         int w = (int)_spinWidth.Value;
         int h = (int)_spinHeight.Value;
-        int maxMines = w * h - 1;
+        int maxMines = w * h - 9; // must leave room for first-click safe zone
+        if (maxMines < 1) maxMines = 1;
         _spinMines.MaxValue = maxMines;
         _spinMines.Suffix = $" / {maxMines}";
         _sliderMines.MaxValue = maxMines;
@@ -225,12 +227,15 @@ public partial class GameManager : Control
     }
 
     public override void _Process(double delta) {
-        if (_achvAnimating)
+        if (_achvAnimating) {
             AnimateAchievementPopup((float)delta);
+        }
     }
 
     private void ShowNextAchievement() {
-        if (_achvQueue.Count == 0) return;
+        if (_achvQueue.Count == 0) {
+            return;
+        }
 
         var achv = _achvQueue.Dequeue();
         _newAchvName.Text = achv.Name;
