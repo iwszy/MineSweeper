@@ -13,7 +13,7 @@ public partial class Cell : Control
     [Signal]
     public delegate void ChordClickedEventHandler();
 
-    public static int PixelSize = 50;
+    public static int PixelSize = 40;
 
     public int GridX { get; set; }
     public int GridY { get; set; }

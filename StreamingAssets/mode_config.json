@@ -8,8 +8,8 @@
   ],
   "customMode": {
     "minWidth": 5,
-    "maxWidth": 40,
+    "maxWidth": 35,
     "minHeight": 5,
-    "maxHeight": 40
+    "maxHeight": 35
   }
 }
