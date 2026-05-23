@@ -3,15 +3,30 @@
 		{
 			"image": "img.png",
 			"size": {
-				"w": 411,
-				"h": 54
+				"w": 242,
+				"h": 116
 			},
 			"sprites": [
+				{
+					"filename": "new_score.png",
+					"region": {
+						"x": 1,
+						"y": 1,
+						"w": 64,
+						"h": 64
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
 				{
 					"filename": "home.png",
 					"region": {
 						"x": 1,
-						"y": 1,
+						"y": 67,
 						"w": 48,
 						"h": 48
 					},
@@ -26,7 +41,7 @@
 					"filename": "pause.png",
 					"region": {
 						"x": 51,
-						"y": 1,
+						"y": 67,
 						"w": 48,
 						"h": 48
 					},
@@ -40,7 +55,7 @@
 				{
 					"filename": "run.png",
 					"region": {
-						"x": 101,
+						"x": 67,
 						"y": 1,
 						"w": 48,
 						"h": 48
@@ -55,7 +70,7 @@
 				{
 					"filename": "setting.png",
 					"region": {
-						"x": 151,
+						"x": 117,
 						"y": 1,
 						"w": 48,
 						"h": 48
@@ -70,7 +85,7 @@
 				{
 					"filename": "1.png",
 					"region": {
-						"x": 201,
+						"x": 167,
 						"y": 1,
 						"w": 25,
 						"h": 25
@@ -85,8 +100,8 @@
 				{
 					"filename": "2.png",
 					"region": {
-						"x": 201,
-						"y": 28,
+						"x": 194,
+						"y": 1,
 						"w": 25,
 						"h": 25
 					},
@@ -100,8 +115,8 @@
 				{
 					"filename": "3.png",
 					"region": {
-						"x": 228,
-						"y": 1,
+						"x": 167,
+						"y": 28,
 						"w": 25,
 						"h": 25
 					},
@@ -115,157 +130,7 @@
 				{
 					"filename": "4.png",
 					"region": {
-						"x": 228,
-						"y": 28,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "5.png",
-					"region": {
-						"x": 255,
-						"y": 1,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "6.png",
-					"region": {
-						"x": 255,
-						"y": 28,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "7.png",
-					"region": {
-						"x": 282,
-						"y": 1,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "8.png",
-					"region": {
-						"x": 282,
-						"y": 28,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "error.png",
-					"region": {
-						"x": 309,
-						"y": 1,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "explode.png",
-					"region": {
-						"x": 309,
-						"y": 28,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "flag.png",
-					"region": {
-						"x": 336,
-						"y": 1,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "hide.png",
-					"region": {
-						"x": 336,
-						"y": 28,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "mine.png",
-					"region": {
-						"x": 363,
-						"y": 1,
-						"w": 25,
-						"h": 25
-					},
-					"margin": {
-						"x": 0,
-						"y": 0,
-						"w": 0,
-						"h": 0
-					}
-				},
-				{
-					"filename": "question.png",
-					"region": {
-						"x": 363,
+						"x": 194,
 						"y": 28,
 						"w": 25,
 						"h": 25
@@ -280,10 +145,160 @@
 				{
 					"filename": "0.png",
 					"region": {
-						"x": 390,
+						"x": 221,
 						"y": 1,
 						"w": 20,
 						"h": 20
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "5.png",
+					"region": {
+						"x": 101,
+						"y": 51,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "6.png",
+					"region": {
+						"x": 101,
+						"y": 78,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "7.png",
+					"region": {
+						"x": 128,
+						"y": 51,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "8.png",
+					"region": {
+						"x": 128,
+						"y": 78,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "error.png",
+					"region": {
+						"x": 155,
+						"y": 55,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "explode.png",
+					"region": {
+						"x": 182,
+						"y": 55,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "flag.png",
+					"region": {
+						"x": 155,
+						"y": 82,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "hide.png",
+					"region": {
+						"x": 182,
+						"y": 82,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "mine.png",
+					"region": {
+						"x": 209,
+						"y": 55,
+						"w": 25,
+						"h": 25
+					},
+					"margin": {
+						"x": 0,
+						"y": 0,
+						"w": 0,
+						"h": 0
+					}
+				},
+				{
+					"filename": "question.png",
+					"region": {
+						"x": 209,
+						"y": 82,
+						"w": 25,
+						"h": 25
 					},
 					"margin": {
 						"x": 0,
@@ -298,6 +313,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "1.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:e7f60199757de7cf4c6e8e8ecd6913f7:35e8aa39f6c21d93ebd835d96a0c9302:6b5dc3663eb4adba6776b27f46f6ffb8$"
+		"smartupdate": "$TexturePacker:SmartUpdate:f9766d3573fe0c72346046fd9799f5b8:58bae19df590f3d0431d104ced880180:6b5dc3663eb4adba6776b27f46f6ffb8$"
 	}
 }

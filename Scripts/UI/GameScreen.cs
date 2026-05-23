@@ -32,10 +32,24 @@ public partial class GameScreen : Control
     private int _pendingRevealCount;
     private bool _justFirstClicked;
 
+    // Win animation state
+    private bool _animating;
+    private float _scanRow;
+    private int _lastScannedRow;
+    private const float ScanSpeed = 1f; // rows per second
+    private ColorRect? _scanlineBar;
+    private ColorRect? _scanTrailBar;
+
+    // Stamp animation state
+    private bool _stampAnimating;
+    private float _stampProgress;
+    private TextureRect? _stampImage;
+
     public override void _Ready() {
         _mineCounter = GetNode<Label>("Label_MineCount");
         _timerLabel = GetNode<Label>("Label_Time");
         _newGameButton = GetNode<Button>("Button_NewGame");
+        _timerLabel.GetNode<TextureRect>("Image_NewBestTime").Visible = false;
 
         // Pin mine counter to left edge (aligns with grid left)
         _mineCounter.LayoutMode = 1;
@@ -50,13 +64,6 @@ public partial class GameScreen : Control
         _timerLabel.AnchorRight = 1;
         _timerLabel.OffsetLeft = -200;
         _timerLabel.OffsetRight = -50;
-
-        // Center button horizontally
-        // _newGameButton.LayoutMode = 1;
-        // _newGameButton.AnchorLeft = 0.5f;
-        // _newGameButton.AnchorRight = 0.5f;
-        // _newGameButton.OffsetLeft = -70;
-        // _newGameButton.OffsetRight = 70;
 
         GetNode<Button>("Button_Home").Pressed += () => {
             if (_logic is { Status: GameStatus.Playing })
@@ -138,6 +145,12 @@ public partial class GameScreen : Control
         _timer.Update(delta);
         if (_timer.IsRunning)
             UpdateTimerLabel();
+
+        if (_animating)
+            AnimateScanline((float)delta);
+
+        if (_stampAnimating)
+            AnimateStamp((float)delta);
     }
 
     public override void _Notification(int what) {
@@ -164,7 +177,7 @@ public partial class GameScreen : Control
         _mineCounter.Position = new Vector2(mineCounterX, mineCounterY);
 
         var gridRight = _minefieldView.OffsetLeft + gridLeft
-            + Mathf.Min(gridPixelW, viewSize.X);
+                                                  + Mathf.Min(gridPixelW, viewSize.X);
         var timeLabelX = gridRight - _timerLabel.Size.X;
         _timerLabel.Position = new Vector2(timeLabelX, mineCounterY);
 
@@ -187,12 +200,15 @@ public partial class GameScreen : Control
     }
 
     private void OnCellLeftClicked(int x, int y) {
-        if (_logic == null) return;
+        if (_logic == null) {
+            return;
+        }
         _justFirstClicked = !_logic.Model.MinesPlaced;
         _pendingRevealCount = 0;
         _logic.RevealCell(x, y);
-        if (_justFirstClicked && _logic.Status == GameStatus.Playing)
+        if (_justFirstClicked && _logic.Status == GameStatus.Playing) {
             _timer.Start();
+        }
         _justFirstClicked = false;
     }
 
@@ -206,16 +222,18 @@ public partial class GameScreen : Control
         if (_logic == null) return;
         _pendingRevealCount = 0;
         _logic.ChordReveal(x, y);
-        if (_pendingRevealCount > MaxChordRevealCount)
+        if (_pendingRevealCount > MaxChordRevealCount) {
             MaxChordRevealCount = _pendingRevealCount;
+        }
     }
 
     private void OnCellRevealed(Vector2I pos, int adjacentMines) {
         _minefieldView?.UpdateCell(pos.X, pos.Y, CellState.Revealed, adjacentMines);
         _pendingRevealCount++;
         CurrentConsecutiveReveals++;
-        if (CurrentConsecutiveReveals > MaxConsecutiveReveals)
+        if (CurrentConsecutiveReveals > MaxConsecutiveReveals) {
             MaxConsecutiveReveals = CurrentConsecutiveReveals;
+        }
     }
 
     private void OnCellsRevealedBatch(List<Vector2I> cells) {
@@ -224,6 +242,7 @@ public partial class GameScreen : Control
             int adj = _logic.Model.AdjacentMineCounts[pos.X, pos.Y];
             _minefieldView.UpdateCell(pos.X, pos.Y, CellState.Revealed, adj);
         }
+
         _pendingRevealCount += cells.Count;
         CurrentConsecutiveReveals += cells.Count;
         if (CurrentConsecutiveReveals > MaxConsecutiveReveals)
@@ -245,17 +264,23 @@ public partial class GameScreen : Control
     private void OnGameWon() {
         if (_logic == null || _minefieldView == null) return;
         _timer.Stop();
-        for (int x = 0; x < _logic.Model.Width; x++) {
-            for (int y = 0; y < _logic.Model.Height; y++) {
-                if (_logic.Model.MineMap[x, y]
-                    && _logic.DisplayState[x, y] != CellState.Flagged) {
-                    _logic.DisplayState[x, y] = CellState.Flagged;
-                    _minefieldView.UpdateCell(x, y, CellState.Flagged, -1);
-                }
-            }
-        }
-        DisableAllCells();
-        GameEnded?.Invoke(true, _timer.Elapsed, _currentMode);
+        _animating = true;
+        _scanRow = _currentMode.Height;
+        _lastScannedRow = _currentMode.Height;
+
+        // Create scanline bar (bright cyan line)
+        _scanlineBar = new ColorRect();
+        _scanlineBar.Color = new Color(0, 1, 0.9f, 0.9f);
+        _scanlineBar.Size = new Vector2(_minefieldView.Size.X, 2);
+        _scanlineBar.MouseFilter = MouseFilterEnum.Ignore;
+        _minefieldView.AddChild(_scanlineBar);
+
+        // Create trail glow (fading below the scanline)
+        _scanTrailBar = new ColorRect();
+        _scanTrailBar.Color = new Color(0.15f, 0.75f, 0.9f, 0.25f);
+        _scanTrailBar.Size = new Vector2(_minefieldView.Size.X, 50);
+        _scanTrailBar.MouseFilter = MouseFilterEnum.Ignore;
+        _minefieldView.AddChild(_scanTrailBar);
     }
 
     private void OnFlagChanged(Vector2I pos, CellState newState) {
@@ -264,11 +289,101 @@ public partial class GameScreen : Control
             UpdateMineCounter(_currentMode.MineCount - _logic.FlagCount);
     }
 
+    private void AnimateScanline(float delta) {
+        if (_logic == null || _minefieldView == null) {
+            return;
+        }
+
+        _scanRow -= ScanSpeed * delta;
+        int currentRow = Mathf.Max(0, Mathf.CeilToInt(_scanRow));
+
+        // Reveal mines in newly passed rows
+        for (int y = _lastScannedRow - 1; y >= currentRow; y--) {
+            for (int x = 0; x < _currentMode.Width; x++) {
+                if (_logic.Model.MineMap[x, y]) {
+                    _logic.DisplayState[x, y] = CellState.Revealed;
+                    _minefieldView.UpdateCell(x, y, CellState.Revealed, -1);
+                }
+            }
+        }
+
+        _lastScannedRow = currentRow;
+
+        // Position scanline and trail on the grid
+        var viewSize = _minefieldView.Size;
+        var gridW = _currentMode.Width * Cell.PixelSize;
+        var gridH = _currentMode.Height * Cell.PixelSize;
+        var gridLeft = Mathf.Max(0, (viewSize.X - gridW) / 2);
+        var gridTop = Mathf.Max(0, (viewSize.Y - gridH) / 2);
+        var scanY = gridTop + _scanRow * Cell.PixelSize;
+
+        if (_scanlineBar != null) {
+            _scanlineBar.Position = new Vector2(gridLeft, scanY);
+            _scanlineBar.Size = new Vector2(Mathf.Min(gridW, viewSize.X), 2);
+        }
+
+        if (_scanTrailBar != null) {
+            _scanTrailBar.Position = new Vector2(gridLeft, scanY);
+            _scanTrailBar.Size = new Vector2(Mathf.Min(gridW, viewSize.X), 25);
+        }
+
+        if (_scanRow <= 0) {
+            _animating = false;
+            _scanlineBar?.QueueFree();
+            _scanlineBar = null;
+            _scanTrailBar?.QueueFree();
+            _scanTrailBar = null;
+            DisableAllCells();
+            GameEnded?.Invoke(true, _timer.Elapsed, _currentMode);
+        }
+    }
+
+    public void PlayStampAnimation() {
+        _stampAnimating = true;
+        _stampProgress = 0f;
+
+        _stampImage = _timerLabel.GetNode<TextureRect>("Image_NewBestTime");
+        _stampImage.Visible = true;
+
+        // Start large — stamp is raised
+        _stampImage.PivotOffset = _stampImage.Size / 2;
+        _stampImage.Scale = new Vector2(2.5f, 2.5f);
+    }
+
+    private void AnimateStamp(float delta) {
+        if (_stampImage == null) {
+            return;
+        }
+
+        _stampProgress += delta / 0.5f;
+        float t = Mathf.Min(_stampProgress, 1f);
+
+        // Stamp: large → slam down (overshoot) → settle
+        float scale;
+        if (t < 0.25f) {
+            scale = 2.5f - t / 0.25f * 1.7f; // 2.5 → 0.8  (slam)
+        } else if (t < 0.5f) {
+            scale = 0.8f + (t - 0.25f) / 0.25f * 0.3f; // 0.8 → 1.1  (bounce up)
+        } else {
+            scale = 1.1f - (t - 0.5f) / 0.5f * 0.1f; // 1.1 → 1.0  (settle)
+        }
+
+        _stampImage.Scale = new Vector2(scale, scale);
+
+        if (_stampProgress >= 1f) {
+            _stampImage.Scale = Vector2.One;
+            _stampAnimating = false;
+        }
+    }
+
     private void DisableAllCells() {
         if (_minefieldView == null) return;
-        for (int x = 0; x < _currentMode.Width; x++)
-            for (int y = 0; y < _currentMode.Height; y++)
-                if (_minefieldView.GetCell(x, y) is { } cell)
+        for (int x = 0; x < _currentMode.Width; x++) {
+            for (int y = 0; y < _currentMode.Height; y++) {
+                if (_minefieldView.GetCell(x, y) is { } cell) {
                     cell.MouseFilter = MouseFilterEnum.Ignore;
+                }
+            }
+        }
     }
 }

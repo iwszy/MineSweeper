@@ -9,7 +9,6 @@ public partial class GameManager : Control
     private Panel _achievementPanel = null!;
     private VBoxContainer _achievementContainer = null!;
     private Panel _achievementTemplate = null!;
-    private ResultDialog _resultDialog = null!;
     private BestTimes _bestTimes = null!;
     private AchievementData _achievementData = null!;
 
@@ -60,8 +59,7 @@ public partial class GameManager : Control
         RefreshBestTimes();
 
         _achievementPanel = GetNode<Panel>("MainMenu/Panel_Achievements");
-        _achievementPanel.GetNode<Button>("Button_Home").Pressed += () =>
-            HideAchievements();
+        _achievementPanel.GetNode<Button>("Button_Home").Pressed += HideAchievements;
         GetNode<Button>("MainMenu/Button_Achievement").Pressed += ShowAchievements;
 
         var scroll = _achievementPanel.GetNode<ScrollContainer>("ScrollContainer");
@@ -94,19 +92,6 @@ public partial class GameManager : Control
         };
         _customPanel.GetNode<Button>("Button_Cancel").Pressed += () =>
             _customPanel.Visible = false;
-
-        _resultDialog = new ResultDialog();
-        _resultDialog.PlayAgainRequested += () => {
-            _resultDialog.Visible = false;
-            _gameScreen.NewGame(_lastMode);
-        };
-        _resultDialog.BackToMenuRequested += () => {
-            _resultDialog.Visible = false;
-            _gameScreen.Visible = false;
-            _mainMenu.Visible = true;
-            RefreshBestTimes();
-        };
-        AddChild(_resultDialog);
     }
 
     private void StartGame(GameMode mode) {
@@ -142,16 +127,19 @@ public partial class GameManager : Control
         _spinMines.MaxValue = maxMines;
         _spinMines.Suffix = $" / {maxMines}";
         _sliderMines.MaxValue = maxMines;
-        if (_spinMines.Value > maxMines)
+        if (_spinMines.Value > maxMines) {
             _spinMines.Value = maxMines;
+        }
     }
 
     private void ShowAchievements() {
         var children = _achievementContainer.GetChildren();
         for (int i = children.Count - 1; i >= 0; i--) {
-            if (children[i] != _achievementTemplate)
+            if (children[i] != _achievementTemplate) {
                 children[i].QueueFree();
+            }
         }
+
         _achievementTemplate.Visible = false;
 
         foreach (var def in AchievementDef.All) {
@@ -163,6 +151,7 @@ public partial class GameManager : Control
                 _achievementData.IsUnlocked(def.Id) ? def.Description : "达成条件隐藏";
             _achievementContainer.AddChild(panel);
         }
+
         _achievementPanel.Visible = true;
     }
 
@@ -190,7 +179,7 @@ public partial class GameManager : Control
         var logic = _gameScreen.CurrentLogic;
         bool allMinesFlagged = won && logic is { AllMinesFlagged: true };
 
-        var newAchievements = _achievementData.CheckOnGameEnd(
+        _achievementData.CheckOnGameEnd(
             won, mode, time,
             logic?.FlagCount ?? 0,
             allMinesFlagged,
@@ -200,13 +189,10 @@ public partial class GameManager : Control
             _gameScreen.MaxConsecutiveReveals,
             _bestTimes);
 
-        if (won && !mode.IsCustom) {
-            bool isNewBest = _bestTimes.TryUpdate(mode.Name, time);
-            _resultDialog.ShowResult(won, time, _bestTimes.Get(mode.Name), isNewBest,
-                newAchievements);
-        } else {
-            _resultDialog.ShowResult(won, time, null, false,
-                newAchievements.Count > 0 ? newAchievements : null);
+        if (won && !mode.IsCustom && _bestTimes.TryUpdate(mode.Name, time)) {
+            _gameScreen.PlayStampAnimation();
         }
+
+        RefreshBestTimes();
     }
 }

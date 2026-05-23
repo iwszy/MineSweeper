@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://d0l4ooq73mave" path="res://resources/images/img.sprites/home.tres" id="4_jyhfs"]
 [ext_resource type="Script" uid="uid://b47w432kbrpmh" path="res://Scripts/UI/GameScreen.cs" id="5_tefeu"]
 [ext_resource type="Texture2D" uid="uid://h6cyotcsuybn" path="res://resources/images/img.sprites/run.tres" id="6_o6xl0"]
+[ext_resource type="Texture2D" uid="uid://bst3m0wll1rny" path="res://resources/images/img.sprites/new_score.tres" id="7_o6xl0"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_IconNormal"]
 bg_color = Color(0, 0, 0, 0)
@@ -866,6 +867,19 @@ theme_override_fonts/font = ExtResource("2_0wfyh")
 theme_override_font_sizes/font_size = 35
 text = "00:00:00.00"
 vertical_alignment = 1
+
+[node name="Image_NewBestTime" type="TextureRect" parent="GameScreen/Label_Time" unique_id=1686967216]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -60.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 60.0
+grow_horizontal = 0
+texture = ExtResource("7_o6xl0")
+expand_mode = 1
 
 [node name="Button_NewGame" type="Button" parent="GameScreen" unique_id=2136856256]
 layout_mode = 1
