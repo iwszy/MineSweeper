@@ -42,7 +42,7 @@ public partial class GameScreen : Control
     private bool _animating;
     private float _scanRow;
     private int _lastScannedRow;
-    private const float ScanSpeed = 1f; // rows per second
+    public float ScanSpeed = 1f; // rows per second
     private ColorRect? _scanlineBar;
     private ColorRect? _scanTrailBar;
 

@@ -26,6 +26,11 @@ public partial class GameManager : Control
     private Button[] _modeButtons = new Button[6];
     private Label[] _modeLabels = new Label[6];
 
+    // Settings panel
+    private Panel _settingPanel = null!;
+    private SpinBox _spinScanSpeed = null!;
+    private HSlider _sliderScanSpeed = null!;
+
     // Achievement notification
     private Panel _newAchvPanel = null!;
     private Label _newAchvName = null!;
@@ -48,7 +53,7 @@ public partial class GameManager : Control
         _gameScreen.Visible = false;
 
         GetNode<Button>("MainMenu/Button_Setting").Pressed += () =>
-            GD.Print("Settings not implemented");
+            _settingPanel.Visible = true;
 
         var presets = GameMode.Presets;
         for (int i = 0; i < 6; i++) {
@@ -101,6 +106,43 @@ public partial class GameManager : Control
         };
         _customPanel.GetNode<Button>("Button_Cancel").Pressed += () =>
             _customPanel.Visible = false;
+
+        // Settings panel
+        _settingPanel = GetNode<Panel>("MainMenu/Panel_Setting");
+        _settingPanel.Visible = false;
+        _spinScanSpeed = _settingPanel.GetNode<SpinBox>("SpinBox_ScanSpeed");
+        _sliderScanSpeed = _settingPanel.GetNode<HSlider>("HSlider_ScanSpeed");
+
+        _spinScanSpeed.MinValue = 0.1;
+        _spinScanSpeed.MaxValue = 30;
+        _spinScanSpeed.Value = _gameScreen.ScanSpeed;
+        _sliderScanSpeed.MinValue = 0.1;
+        _sliderScanSpeed.MaxValue = 30;
+        _sliderScanSpeed.Value = _gameScreen.ScanSpeed;
+        _spinScanSpeed.ValueChanged += v => {
+            _sliderScanSpeed.Value = v;
+            _gameScreen.ScanSpeed = (float)v;
+        };
+        _sliderScanSpeed.ValueChanged += v => {
+            _spinScanSpeed.Value = v;
+            _gameScreen.ScanSpeed = (float)v;
+        };
+
+        _settingPanel.GetNode<Button>("Button_ClearHistory").Pressed += () => {
+            _bestTimes.Times.Clear();
+            _bestTimes.Save();
+            RefreshBestTimes();
+        };
+
+        _settingPanel.GetNode<Button>("Button_ClearAchievement").Pressed += () => {
+            _achievementData.Unlocked.Clear();
+            _achievementData.ModeWins.Clear();
+            _achievementData.CumulativeLosses = 0;
+            _achievementData.Save();
+        };
+
+        _settingPanel.GetNode<Button>("Button_Cancel").Pressed += () =>
+            _settingPanel.Visible = false;
 
         _newAchvPanel = GetNode<Panel>("Panel_NewAchievement");
         _newAchvName = _newAchvPanel.GetNode<Label>("Label_AchievementName");
