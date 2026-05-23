@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 
 namespace MineSweeper;
 
@@ -24,6 +25,14 @@ public partial class GameManager : Control
     private GameMode _lastMode;
     private Button[] _modeButtons = new Button[6];
     private Label[] _modeLabels = new Label[6];
+
+    // Achievement notification
+    private Panel _newAchvPanel = null!;
+    private Label _newAchvName = null!;
+    private Queue<AchievementDef.Achievement> _achvQueue = new();
+    private bool _achvAnimating;
+    private float _achvAnimProgress;
+    private float _achvTargetY;
 
     public override void _Ready() {
         _bestTimes = new BestTimes();
@@ -92,6 +101,11 @@ public partial class GameManager : Control
         };
         _customPanel.GetNode<Button>("Button_Cancel").Pressed += () =>
             _customPanel.Visible = false;
+
+        _newAchvPanel = GetNode<Panel>("Panel_NewAchievement");
+        _newAchvName = _newAchvPanel.GetNode<Label>("Label_AchievementName");
+        _newAchvPanel.Visible = false;
+        _achvTargetY = _newAchvPanel.Position.Y;
     }
 
     private void StartGame(GameMode mode) {
@@ -145,10 +159,45 @@ public partial class GameManager : Control
         foreach (var def in AchievementDef.All) {
             var panel = (Panel)_achievementTemplate.Duplicate();
             panel.Visible = true;
-            panel.GetNode<Label>("Label_Name").Text =
-                _achievementData.IsUnlocked(def.Id) ? def.Name : "???";
-            panel.GetNode<Label>("Label_Description").Text =
-                _achievementData.IsUnlocked(def.Id) ? def.Description : "达成条件隐藏";
+
+            var unlocked = _achievementData.IsUnlocked(def.Id);
+            var nameLabel = panel.GetNode<Label>("Label_Name");
+            var descLabel = panel.GetNode<Label>("Label_Description");
+
+            nameLabel.Text = def.Name;
+            descLabel.Text = def.Description;
+
+            if (unlocked) {
+                nameLabel.AddThemeColorOverride("font_color",
+                    new Color(0.25f, 0.18f, 0.05f, 1f));
+                descLabel.AddThemeColorOverride("font_color",
+                    new Color(0.35f, 0.28f, 0.15f, 1f));
+                panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat {
+                    BgColor = new Color(0.98f, 0.96f, 0.9f, 1f),
+                    BorderWidthLeft = 2, BorderWidthTop = 2,
+                    BorderWidthRight = 2, BorderWidthBottom = 2,
+                    BorderColor = new Color(0.75f, 0.6f, 0.25f, 1f),
+                    CornerRadiusTopLeft = 6, CornerRadiusTopRight = 6,
+                    CornerRadiusBottomRight = 6, CornerRadiusBottomLeft = 6,
+                    ShadowColor = new Color(0.65f, 0.5f, 0.15f, 0.2f),
+                    ShadowSize = 3,
+                    ShadowOffset = new Vector2(0, 1),
+                });
+            } else {
+                nameLabel.AddThemeColorOverride("font_color",
+                    new Color(0.45f, 0.45f, 0.48f, 1f));
+                descLabel.AddThemeColorOverride("font_color",
+                    new Color(0.55f, 0.55f, 0.58f, 1f));
+                panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat {
+                    BgColor = new Color(0.88f, 0.88f, 0.89f, 1f),
+                    BorderWidthLeft = 1, BorderWidthTop = 1,
+                    BorderWidthRight = 1, BorderWidthBottom = 1,
+                    BorderColor = new Color(0.78f, 0.78f, 0.8f, 1f),
+                    CornerRadiusTopLeft = 6, CornerRadiusTopRight = 6,
+                    CornerRadiusBottomRight = 6, CornerRadiusBottomLeft = 6,
+                });
+            }
+
             _achievementContainer.AddChild(panel);
         }
 
@@ -175,11 +224,63 @@ public partial class GameManager : Control
         RefreshBestTimes();
     }
 
+    public override void _Process(double delta) {
+        if (_achvAnimating)
+            AnimateAchievementPopup((float)delta);
+    }
+
+    private void ShowNextAchievement() {
+        if (_achvQueue.Count == 0) return;
+
+        var achv = _achvQueue.Dequeue();
+        _newAchvName.Text = achv.Name;
+
+        // Start from above the screen
+        _newAchvPanel.Position = new Vector2(
+            _newAchvPanel.Position.X,
+            -_newAchvPanel.Size.Y - 20
+        );
+        _newAchvPanel.Visible = true;
+
+        _achvAnimating = true;
+        _achvAnimProgress = 0f;
+    }
+
+    private void AnimateAchievementPopup(float delta) {
+        _achvAnimProgress = Mathf.Min(_achvAnimProgress + delta / 0.5f, 1f);
+        float t = _achvAnimProgress;
+
+        // Bounce curve: slide from above → overshoot down → settle
+        float y;
+        if (t < 0.55f) {
+            y = Mathf.Lerp(-_newAchvPanel.Size.Y - 20, _achvTargetY + 15, t / 0.55f);
+        } else if (t < 0.8f) {
+            y = Mathf.Lerp(_achvTargetY + 15, _achvTargetY - 5, (t - 0.55f) / 0.25f);
+        } else {
+            y = Mathf.Lerp(_achvTargetY - 5, _achvTargetY, (t - 0.8f) / 0.2f);
+        }
+
+        _newAchvPanel.Position = new Vector2(_newAchvPanel.Position.X, y);
+
+        if (_achvAnimProgress >= 1f) {
+            _achvAnimating = false;
+            _newAchvPanel.Position = new Vector2(_newAchvPanel.Position.X, _achvTargetY);
+
+            // Display for 2 seconds, then hide and show next
+            GetTree().CreateTimer(1.0).Timeout += () => {
+                _newAchvPanel.Visible = false;
+                if (_achvQueue.Count > 0) {
+                    ShowNextAchievement();
+                }
+            };
+        }
+    }
+
     private void OnGameEnded(bool won, double time, GameMode mode) {
         var logic = _gameScreen.CurrentLogic;
         bool allMinesFlagged = won && logic is { AllMinesFlagged: true };
 
-        _achievementData.CheckOnGameEnd(
+        var newAchievements = _achievementData.CheckOnGameEnd(
             won, mode, time,
             logic?.FlagCount ?? 0,
             allMinesFlagged,
@@ -192,6 +293,12 @@ public partial class GameManager : Control
         if (won && !mode.IsCustom && _bestTimes.TryUpdate(mode.Name, time)) {
             _gameScreen.PlayStampAnimation();
         }
+
+        foreach (var achv in newAchievements)
+            _achvQueue.Enqueue(achv);
+
+        if (!_achvAnimating && _achvQueue.Count > 0)
+            ShowNextAchievement();
 
         RefreshBestTimes();
     }
