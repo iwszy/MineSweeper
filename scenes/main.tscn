@@ -617,9 +617,12 @@ text = "成就"
 
 [node name="Panel_Achievements" type="Panel" parent="MainMenu" unique_id=190217508]
 visible = false
-layout_mode = 0
-offset_right = 600.0
-offset_bottom = 800.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_tbgi4")
 
 [node name="Image_Title" type="TextureRect" parent="MainMenu/Panel_Achievements" unique_id=1988465503]
@@ -653,14 +656,17 @@ expand_icon = true
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MainMenu/Panel_Achievements" unique_id=246494990]
 layout_mode = 1
-anchors_preset = 5
+anchors_preset = 8
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
+anchor_bottom = 0.5
 offset_left = -250.0
-offset_top = 160.0
+offset_top = -240.0
 offset_right = 250.0
-offset_bottom = 770.0
+offset_bottom = 370.0
 grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer_Achievements" type="VBoxContainer" parent="MainMenu/Panel_Achievements/ScrollContainer" unique_id=215394402]
 custom_minimum_size = Vector2(500, 0)
