@@ -243,6 +243,9 @@ public partial class GameScreen : Control
     }
 
     private void TogglePause() {
+        if (_logic.Status != GameStatus.Playing) {
+            return;
+        }
         _isPaused = !_isPaused;
         if (_isPaused) {
             _timer.Stop();
