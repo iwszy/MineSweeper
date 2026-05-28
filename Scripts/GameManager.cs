@@ -141,7 +141,7 @@ public partial class GameManager : Control
             _achievementData.Save();
         };
 
-        _settingPanel.GetNode<Button>("Button_Cancel").Pressed += () =>
+        _settingPanel.GetNode<Button>("Button_Close").Pressed += () =>
             _settingPanel.Visible = false;
 
         _newAchvPanel = GetNode<Panel>("Panel_NewAchievement");
