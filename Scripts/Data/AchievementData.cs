@@ -88,7 +88,7 @@ public class AchievementData
 
         // A11: 普通 under 120s
         if (mode.Name == "普通" && time < 120) {
-            TryUnlock("A12", unlocked);
+            TryUnlock("A11", unlocked);
         }
 
         // A12: All 5 preset modes won
@@ -99,7 +99,7 @@ public class AchievementData
 
         // A13: 超凡 with <= 5 flags
         if (mode.Name == "超凡" && flagCount <= 5) {
-            TryUnlock("A14", unlocked);
+            TryUnlock("A13", unlocked);
         }
 
         // A14: Time at least 10% faster than previous best
